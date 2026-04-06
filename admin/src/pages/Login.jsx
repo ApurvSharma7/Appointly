@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useContext, useState } from 'react'
 import { DoctorContext } from '../context/DoctorContext'
 import { AdminContext } from '../context/AdminContext'
+import { assets } from '../assets/assets'
 import { toast } from 'react-toastify'
 
 const Login = () => {
@@ -45,23 +46,49 @@ const Login = () => {
   }
 
   return (
-    <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
-      <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg'>
-        <p className='text-2xl font-semibold m-auto'><span className='text-primary'>{state}</span> Login</p>
-        <div className='w-full '>
-          <p>Email</p>
-          <input onChange={(e) => setEmail(e.target.value)} value={email} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="email" required />
+    <form onSubmit={onSubmitHandler} className='min-h-screen flex flex-col items-center justify-center bg-black'>
+      <img className='w-24 h-24 mb-6 hover:scale-110 transition-all' src={assets.appointly_logo} alt="Appointly Logo" />
+
+      <div className='glass-card flex flex-col gap-6 items-start p-10 min-w-[340px] sm:min-w-[420px] text-white'>
+        <div className='w-full'>
+          <h1 className='text-2xl font-bold mb-1'>{state} Panel</h1>
+          <p className='text-gray-400 font-medium'>Please sign in to continue</p>
         </div>
-        <div className='w-full '>
-          <p>Password</p>
-          <input onChange={(e) => setPassword(e.target.value)} value={password} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="password" required />
+        
+        <div className='w-full flex flex-col gap-4'>
+          <div className='w-full'>
+            <p className='mb-2 text-sm font-medium text-gray-300'>Email Address</p>
+            <input 
+              onChange={(e) => setEmail(e.target.value)} 
+              value={email} 
+              className='glass-input' 
+              type="email" 
+              placeholder='your@email.com'
+              required 
+            />
+          </div>
+          <div className='w-full'>
+            <p className='mb-2 text-sm font-medium text-gray-300'>Password</p>
+            <input 
+              onChange={(e) => setPassword(e.target.value)} 
+              value={password} 
+              className='glass-input' 
+              type="password" 
+              placeholder='Enter your password'
+              required 
+            />
+          </div>
         </div>
-        <button className='bg-primary text-white w-full py-2 rounded-md text-base'>Login</button>
-        {
-          state === 'Admin'
-            ? <p>Doctor Login? <span onClick={() => setState('Doctor')} className='text-primary underline cursor-pointer'>Click here</span></p>
-            : <p>Admin Login? <span onClick={() => setState('Admin')} className='text-primary underline cursor-pointer'>Click here</span></p>
-        }
+
+        <button className='primary-btn w-full mt-2'>Login</button>
+
+        <div className='w-full text-center'>
+          {
+            state === 'Admin'
+              ? <p className='text-sm text-gray-400'>Doctor Login? <span onClick={() => setState('Doctor')} className='text-white font-semibold cursor-pointer hover:underline'>Click here</span></p>
+              : <p className='text-sm text-gray-400'>Admin Login? <span onClick={() => setState('Admin')} className='text-white font-semibold cursor-pointer hover:underline'>Click here</span></p>
+          }
+        </div>
       </div>
     </form>
   )

@@ -131,16 +131,16 @@ const Doctors = () => {
                     alt={doc.name}
                     className="w-full h-full object-cover object-top rounded-[16px] group-hover:scale-105 transition-transform duration-500"
                   />
-                  {doc.available !== false && (
-                    <div className={`absolute top-6 right-6 flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
-                      isNight 
-                        ? "bg-[#000000] backdrop-blur-md border-[rgba(255,255,255,0.1)]" 
-                        : "bg-white border-gray-200 shadow-sm"
-                    }`}>
-                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                      <span className={`text-[10px] font-bold tracking-wider ${isNight ? "text-white" : "text-gray-700"}`}>AVAILABLE</span>
-                    </div>
-                  )}
+                  <div className={`absolute top-6 right-6 flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+                    isNight 
+                      ? "bg-[#000000] backdrop-blur-md border-[rgba(255,255,255,0.1)]" 
+                      : "bg-white border-gray-200 shadow-sm"
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${doc.available ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                    <span className={`text-[10px] font-bold tracking-wider ${isNight ? "text-white" : "text-gray-700"}`}>
+                      {doc.available ? 'AVAILABLE' : 'OFFLINE'}
+                    </span>
+                  </div>
                 </div>
                 
                 <div className="p-6 flex flex-col flex-grow">

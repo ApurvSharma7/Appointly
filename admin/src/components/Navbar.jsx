@@ -20,12 +20,17 @@ const Navbar = () => {
   }
 
   return (
-    <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-white'>
-      <div className='flex items-center gap-2 text-xs'>
-        <img onClick={() => navigate('/')} className='w-36 sm:w-40 cursor-pointer' src={assets.admin_logo} alt="" />
-        <p className='border px-2.5 py-0.5 rounded-full border-gray-500 text-gray-600'>{aToken ? 'Admin' : 'Doctor'}</p>
+    <div className='flex justify-between items-center px-4 sm:px-10 py-4 border-b border-white/10 bg-black sticky top-0 z-50'>
+      <div className='flex items-center gap-3'>
+        <img 
+          onClick={() => navigate('/')} 
+          className='w-12 h-12 cursor-pointer hover:scale-105 transition-all' 
+          src={assets.appointly_logo} 
+          alt="Appointly" 
+        />
+        <p className='border px-2.5 py-0.5 rounded-full border-white/10 text-gray-500 font-bold uppercase text-[10px] tracking-widest'>{aToken ? 'Admin' : 'Doctor'}</p>
       </div>
-      <button onClick={() => logout()} className='bg-primary text-white text-sm px-10 py-2 rounded-full'>Logout</button>
+      <button onClick={() => logout()} className='primary-btn text-sm'>Logout</button>
     </div>
   )
 }

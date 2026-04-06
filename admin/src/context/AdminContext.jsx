@@ -40,11 +40,29 @@ const AdminContextProvider = (props) => {
             const { data } = await axios.post(backendUrl + '/api/admin/change-availability', { docId }, { headers: { aToken } })
             if (data.success) {
                 toast.success(data.message)
-                getAllDoctors()
+                await getAllDoctors()
             } else {
                 toast.error(data.message)
             }
 
+        } catch (error) {
+            console.log(error)
+            toast.error(error.message)
+        }
+    }
+
+
+    // Function to delete doctor using API
+    const deleteDoctor = async (docId) => {
+        try {
+            const { data } = await axios.post(backendUrl + '/api/admin/delete-doctor', { docId }, { headers: { aToken } })
+            if (data.success) {
+                toast.success(data.message)
+                await getAllDoctors()
+                await getDashData()
+            } else {
+                toast.error(data.message)
+            }
         } catch (error) {
             console.log(error)
             toast.error(error.message)
@@ -80,7 +98,8 @@ const AdminContextProvider = (props) => {
 
             if (data.success) {
                 toast.success(data.message)
-                getAllAppointments()
+                await getAllAppointments()
+                await getDashData()
             } else {
                 toast.error(data.message)
             }
@@ -101,7 +120,8 @@ const AdminContextProvider = (props) => {
 
             if (data.success) {
                 toast.success(data.message)
-                getAllAppointments()
+                await getAllAppointments()
+                await getDashData()
             } else {
                 toast.error(data.message)
             }
@@ -142,6 +162,7 @@ const AdminContextProvider = (props) => {
         getDashData,
         cancelAppointment,
         completeAppointment,
+        deleteDoctor,
         dashData
     }
 

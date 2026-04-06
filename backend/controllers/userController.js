@@ -51,7 +51,7 @@ export const registerUser = async (req, res) => {
       user: { _id: user._id, name: user.name, email: user.email, image: user.image },
     });
   } catch (err) {
-    console.error("❌ Register error:", err);
+    console.error("Register error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -75,7 +75,7 @@ export const loginUser = async (req, res) => {
       user: { _id: user._id, name: user.name, email: user.email, image: user.image },
     });
   } catch (err) {
-    console.error("❌ Login error:", err);
+    console.error("Login error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -105,7 +105,7 @@ export const googleLogin = async (req, res) => {
         googleId: sub,
         isGoogleUser: true,
         // No password needed for Google users
-        password: crypto.randomBytes(16).toString("hex"), 
+        password: crypto.randomBytes(16).toString("hex"),
       });
     } else if (!user.isGoogleUser) {
       // If user exists with email but not Google, link them
@@ -125,7 +125,7 @@ export const googleLogin = async (req, res) => {
       user: { _id: user._id, name: user.name, email: user.email, image: user.image },
     });
   } catch (err) {
-    console.error("❌ Google Login error:", err);
+    console.error("Google Login error:", err);
     res.status(401).json({ success: false, message: "Google authentication failed" });
   }
 };
@@ -141,7 +141,7 @@ export const getProfile = async (req, res) => {
     }
     res.json({ success: true, user });
   } catch (err) {
-    console.error("❌ Profile error:", err);
+    console.error("Profile error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -183,7 +183,7 @@ export const updateProfile = async (req, res) => {
       try {
         user.address = typeof address === "string" ? JSON.parse(address) : address;
       } catch (err) {
-        console.error("❌ Address parsing failed:", err.message);
+        console.error("Address parsing failed:", err.message);
         user.address = address; // fallback
       }
     }
@@ -210,7 +210,7 @@ export const updateProfile = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.error("❌ Update profile error:", err);
+    console.error("Update profile error:", err);
     res.status(500).json({
       success: false,
       message: "Server error updating profile",
@@ -236,9 +236,9 @@ export const bookAppointment = async (req, res) => {
 
     // Validate required fields
     if (!docId || !slotDate || !slotTime) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Doctor ID, slot date, and slot time are required" 
+      return res.status(400).json({
+        success: false,
+        message: "Doctor ID, slot date, and slot time are required"
       });
     }
 
@@ -259,23 +259,23 @@ export const bookAppointment = async (req, res) => {
     }
 
     // Check if user already has an appointment at this time
-    const userExistingAppointment = await appointmentModel.findOne({ 
-      userId, 
-      slotDate, 
+    const userExistingAppointment = await appointmentModel.findOne({
+      userId,
+      slotDate,
       slotTime,
       status: { $in: ["Pending", "Confirmed"] }
     });
     if (userExistingAppointment) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "You already have an appointment at this time" 
+      return res.status(400).json({
+        success: false,
+        message: "You already have an appointment at this time"
       });
     }
 
     // Check if slot already booked by any user
-    const existingAppointment = await appointmentModel.findOne({ 
-      docId, 
-      slotDate, 
+    const existingAppointment = await appointmentModel.findOne({
+      docId,
+      slotDate,
       slotTime,
       status: { $in: ["Pending", "Confirmed"] }
     });
@@ -287,11 +287,11 @@ export const bookAppointment = async (req, res) => {
     const appointmentDate = new Date(slotDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (appointmentDate < today) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Cannot book appointments for past dates" 
+      return res.status(400).json({
+        success: false,
+        message: "Cannot book appointments for past dates"
       });
     }
 
@@ -332,7 +332,7 @@ Medigo Team
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">New Appointment Booking</h2>
           
-          <p>Dear Dr. ${doctor.name},</p>
+          <p>Dear ${doctor.name},</p>
           
           <p>A new appointment has been booked with you:</p>
           
@@ -350,16 +350,44 @@ Medigo Team
             <p><strong>Status:</strong> <span style="color: #f59e0b;">Pending</span></p>
           </div>
           
-          <p>Please log in to your admin panel to confirm or manage this appointment.</p>
+          <p>Please log in to your doctor panel to confirm or manage this appointment.</p>
           
-          <p style="margin-top: 30px;">Best regards,<br>Medigo Team</p>
+          <p style="margin-top: 30px;">Best regards,<br>Appointly Team</p>
         </div>
       `;
 
       await sendEmail(doctor.email, emailSubject, emailText, emailHtml);
-      console.log(`✅ Appointment email sent to Dr. ${doctor.name} (${doctor.email})`);
+      console.log(`✅ Appointment email sent to doctor: ${doctor.docId?.email}`);
+
+      // --- 2. Notification to Patient ---
+      const patientSubject = `Booking Request Received - Dr. ${doctor.name}`;
+      const patientHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937;">
+          <h2 style="color: #2563eb;">Booking Received</h2>
+          <p>Dear ${user.name},</p>
+          <p>We've received your appointment request for <strong>Dr. ${doctor.name}</strong>.</p>
+          
+          <div style="background-color: #f8fafc; padding: 25px; border-radius: 12px; margin: 20px 0; border: 1px solid #e2e8f0;">
+            <p><strong>Doctor:</strong> Dr. ${doctor.name}</p>
+            <p><strong>Date:</strong> ${slotDate}</p>
+            <p><strong>Time:</strong> ${slotTime}</p>
+            <p><strong>Status:</strong> <span style="color: #f59e0b; font-weight: bold;">PENDING</span></p>
+          </div>
+          
+          <p>Your appointment is currently being reviewed. You will receive another notification once it's confirmed or after you complete the payment.</p>
+          
+          <p style="margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            Best regards,<br>
+            <strong>Appointly Team</strong>
+          </p>
+        </div>
+      `;
+
+      await sendEmail(user.email, patientSubject, patientSubject, patientHtml);
+      console.log(`✅ Booking confirmation email sent to patient: ${user.email}`);
+
     } catch (emailError) {
-      console.error("❌ Failed to send appointment email:", emailError);
+      console.error("❌ Failed to send initial booking emails:", emailError);
       // Don't fail the appointment booking if email fails
     }
 
@@ -369,7 +397,7 @@ Medigo Team
       data: appointment,
     });
   } catch (err) {
-    console.error("❌ Book appointment error:", err);
+    console.error("Book appointment error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -384,7 +412,7 @@ export const getUserAppointments = async (req, res) => {
 
     res.json({ success: true, data: appointments });
   } catch (err) {
-    console.error("❌ Get appointments error:", err);
+    console.error("Get appointments error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -552,11 +580,11 @@ export const stripeSuccess = async (_, res) => {
 export const getDoctorSlots = async (req, res) => {
   try {
     const { docId } = req.params;
-    
+
     if (!docId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Doctor ID is required" 
+      return res.status(400).json({
+        success: false,
+        message: "Doctor ID is required"
       });
     }
 
@@ -630,7 +658,7 @@ export const rateDoctor = async (req, res) => {
     // Find appointment
     const appointment = await appointmentModel.findById(appointmentId)
       .populate('docId', 'name email');
-    
+
     if (!appointment) {
       return res.status(404).json({
         success: false,
@@ -742,10 +770,10 @@ export const getDoctorReviews = async (req, res) => {
       rating: { $ne: null },
       feedback: { $ne: null, $ne: "" }
     })
-    .populate('userId', 'name image')
-    .select('rating feedback ratedAt')
-    .sort({ ratedAt: -1 })
-    .limit(10); // Limit to latest 10 reviews
+      .populate('userId', 'name image')
+      .select('rating feedback ratedAt')
+      .sort({ ratedAt: -1 })
+      .limit(10); // Limit to latest 10 reviews
 
     res.json({
       success: true,

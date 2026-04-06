@@ -14,8 +14,8 @@ const RelatedDoctors = ({ speciality, docId }) => {
         (doc) => doc.speciality === speciality && doc._id !== docId
       );
 
-      // Force all doctors to be available
-      setRelDoc(filtered.map((d) => ({ ...d, available: true })));
+      // Use actual availability status
+      setRelDoc(filtered);
     }
   }, [doctors, speciality, docId]);
 
@@ -38,9 +38,13 @@ const RelatedDoctors = ({ speciality, docId }) => {
             }`}
           >
             {/* Availability Badge */}
-            <span className={`absolute top-5 left-5 text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10 ${isNight ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-green-100/50 text-green-600 border border-green-100'}`}>
-              <span className="w-2 h-2 rounded-full bg-green-500 inline-block mr-2 animate-pulse"></span>
-              Available
+            <span className={`absolute top-5 left-5 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm z-10 
+              ${item.available 
+                ? (isNight ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-green-100/50 text-green-600 border border-green-100')
+                : (isNight ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-red-100/50 text-red-600 border border-red-100')
+              }`}>
+              <span className={`w-1.5 h-1.5 rounded-full inline-block mr-2 ${item.available ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+              {item.available ? 'Available' : 'Offline'}
             </span>
 
             {/* Doctor Image */}

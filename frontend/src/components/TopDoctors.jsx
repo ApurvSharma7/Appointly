@@ -60,9 +60,11 @@ const TopDoctors = () => {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                                 
                                 {/* Status Indicator */}
-                                <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-xl border border-white/10">
-                                    <div className="w-1.5 h-1.5 bg-[#4ca6a3] rounded-full animate-pulse shadow-[0_0_10px_#4ca6a3]"></div>
-                                    <p className="text-[9px] font-bold text-white uppercase tracking-widest leading-none">Available</p>
+                                <div className={`absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-xl border ${item.available ? 'border-[#4ca6a3]/30' : 'border-red-500/20'}`}>
+                                    <div className={`w-1.5 h-1.5 rounded-full ${item.available ? 'bg-[#4ca6a3] shadow-[0_0_10px_#4ca6a3]' : 'bg-red-500'}`}></div>
+                                    <p className="text-[9px] font-bold text-white uppercase tracking-widest leading-none">
+                                      {item.available ? 'Available' : 'Offline'}
+                                    </p>
                                 </div>
                             </div>
 

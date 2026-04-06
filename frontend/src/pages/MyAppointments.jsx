@@ -278,7 +278,7 @@ const MyAppointments = () => {
                             <Star className="w-3.5 h-3.5 fill-[#4ca6a3] text-[#4ca6a3]" /> Rate Experience
                           </motion.button>
                         )}
-                        {(appt.status === "Pending" || appt.status === "Confirmed") && (
+                        {(appt.status === "Pending" || appt.status === "Confirmed") && appt.paymentStatus !== "Paid" && (
                           <button
                             onClick={() => handleCancel(appt._id)}
                             className={`flex items-center gap-2 transition-all text-[10px] uppercase tracking-widest font-black hover:text-red-500

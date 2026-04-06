@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Wrap in an async IIFE so we can use await.
-const sendEmail = async ( to , subject , text , html) => {
+const sendEmail = async (to, subject, text, html) => {
   const info = await transporter.sendMail({
     from: "quickcourtt@gmail.com",
     to: to,
@@ -23,6 +23,6 @@ const sendEmail = async ( to , subject , text , html) => {
   });
 
   console.log("Message sent:", info.messageId);
-}; 
- 
+};
+
 export default sendEmail

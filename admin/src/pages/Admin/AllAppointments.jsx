@@ -6,70 +6,86 @@ import { AppContext } from '../../context/AppContext'
 
 const AllAppointments = () => {
 
-  const { aToken, appointments, cancelAppointment, completeAppointment, getAllAppointments } = useContext(AdminContext)
+  const { aToken, appointments, cancelAppointment, completeAppointment, getAllAppointments, doctors, getAllDoctors } = useContext(AdminContext)
   const { slotDateFormat, calculateAge, currency } = useContext(AppContext)
 
   useEffect(() => {
     if (aToken) {
       getAllAppointments()
+      getAllDoctors()
     }
   }, [aToken])
 
   return (
-    <div className='w-full max-w-6xl m-5 '>
+    <div className='w-full'>
 
-      <p className='mb-3 text-lg font-medium'>All Appointments</p>
+      <div className='mb-8'>
+        <h1 className='heading-large'>All Appointments</h1>
+        <p className='text-gray-400'>Manage and track all patient bookings and doctor schedules.</p>
+      </div>
 
-      <div className='bg-white border rounded text-sm max-h-[80vh] overflow-y-scroll'>
-        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b'>
+      <div className='glass-card overflow-hidden'>
+        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] py-5 px-8 border-b border-white/10 bg-white/5 text-gray-300 font-semibold uppercase text-xs tracking-wider'>
           <p>#</p>
           <p>Patient</p>
           <p>Age</p>
           <p>Date & Time</p>
           <p>Doctor</p>
           <p>Fees</p>
-          <p>Action</p>
+          <p className='text-right'>Action</p>
         </div>
-        {appointments.map((item, index) => (
-          <div className='flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50' key={index}>
-            <p className='max-sm:hidden'>{index+1}</p>
-            <div className='flex items-center gap-2'>
-              <img src={item.userData?.image || '/default-avatar.png'} className='w-8 rounded-full' alt="" /> 
-              <p>{item.userData?.name || 'Unknown User'}</p>
+
+        <div className='max-h-[70vh] overflow-y-auto'>
+          {appointments.map((item, index) => (
+            <div className='flex flex-wrap justify-between max-sm:gap-4 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-400 py-4 px-8 border-b border-white/5 hover:bg-white/5 transition-all group' key={index}>
+              <p className='max-sm:hidden font-medium'>{index + 1}</p>
+              <div className='flex items-center gap-3'>
+                <img src={item.userData?.image || '/default-avatar.png'} className='w-10 h-10 rounded-full border border-white/10' alt="" />
+                <p className='text-white font-semibold'>{item.userData?.name || 'Unknown User'}</p>
+              </div>
+              <p className='max-sm:hidden'>{item.userData?.dob ? calculateAge(item.userData.dob) : 'N/A'}</p>
+              <div className='flex flex-col gap-0.5'>
+                <p className='text-white font-medium'>{slotDateFormat(item.slotDate)}</p>
+                <p className='text-xs text-gray-500'>{item.slotTime}</p>
+              </div>
+              <div className='flex items-center gap-3'>
+                <img src={item.docData?.image || '/default-avatar.png'} className='w-10 h-10 rounded-full border border-white/10 bg-white/5' alt="" />
+                <p className='text-white font-medium'>{item.docData?.name || 'Unknown Doctor'}</p>
+              </div>
+              <p className='text-white font-bold text-lg'>
+                Rs.{item.docData?.fees || item.amount || doctors.find(d => d._id === item.docId || d._id === item.docData?._id || d.name === item.docData?.name)?.fees || 0}
+              </p>
+              <div className='flex items-center justify-end gap-3'>
+                {(item.cancelled || item.status === 'Cancelled') ? (
+                  <span className='px-3 py-1 bg-red-500/10 text-red-400 text-xs font-bold rounded-full border border-red-500/20'>Cancelled</span>
+                ) : (item.isCompleted || item.status === 'Completed') ? (
+                  <span className='px-3 py-1 bg-green-500/10 text-green-400 text-xs font-bold rounded-full border border-green-500/20'>Completed</span>
+                ) : (
+                  <div className='flex items-center gap-2'>
+                    <button
+                      onClick={() => completeAppointment(item._id)}
+                      className='w-10 h-10 flex items-center justify-center bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white rounded-full transition-all duration-300'
+                      title="Complete"
+                    >
+                      <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M5 13l4 4L19 7' />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => cancelAppointment(item._id)}
+                      className='w-10 h-10 flex items-center justify-center bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-full transition-all duration-300'
+                      title="Cancel"
+                    >
+                      <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M6 18L18 6M6 6l12 12' />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-            <p className='max-sm:hidden'>{item.userData?.dob ? calculateAge(item.userData.dob) : 'N/A'}</p>
-            <p>{slotDateFormat(item.slotDate)}, {item.slotTime}</p>
-            <div className='flex items-center gap-2'>
-              <img src={item.docData?.image || '/default-avatar.png'} className='w-8 rounded-full bg-gray-200' alt="" /> 
-              <p>{item.docData?.name || 'Unknown Doctor'}</p>
-            </div>
-            <p>{currency}{item.amount || 0}</p>
-            <div className='flex items-center gap-2'>
-              {item.cancelled ? (
-                <p className='text-red-400 text-xs font-medium'>Cancelled</p>
-              ) : item.isCompleted ? (
-                <p className='text-green-500 text-xs font-medium'>Completed</p>
-              ) : (
-                <>
-                  <img 
-                    onClick={() => completeAppointment(item._id)} 
-                    className='w-8 cursor-pointer hover:opacity-80' 
-                    src={assets.tick_icon} 
-                    alt="Complete" 
-                    title="Mark as Completed"
-                  />
-                  <img 
-                    onClick={() => cancelAppointment(item._id)} 
-                    className='w-8 cursor-pointer hover:opacity-80' 
-                    src={assets.cancel_icon} 
-                    alt="Cancel" 
-                    title="Cancel Appointment"
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
     </div>

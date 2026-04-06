@@ -12,8 +12,20 @@ const AppContextProvider = (props) => {
 
     // Function to format the date eg. ( 20_01_2000 => 20 Jan 2000 )
     const slotDateFormat = (slotDate) => {
-        const dateArray = slotDate.split('_')
-        return dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2]
+        if (!slotDate) return "N/A"
+
+        let dateArray;
+        if (slotDate.includes('_')) {
+            // Case: 20_01_2000
+            dateArray = slotDate.split('_')
+            return dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2]
+        } else if (slotDate.includes('-')) {
+            // Case: 2024-01-20
+            dateArray = slotDate.split('-')
+            return dateArray[2] + " " + months[Number(dateArray[1]) - 1] + " " + dateArray[0]
+        } else {
+            return slotDate
+        }
     }
 
     // Function to calculate the age eg. ( 20_01_2000 => 24 )

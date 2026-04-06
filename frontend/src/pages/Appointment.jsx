@@ -184,7 +184,13 @@ const Appointment = () => {
             <div>
               <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <h1 className={`text-4xl md:text-6xl font-bold tracking-tighter ${isNight ? 'text-white' : 'text-gray-900'}`}>{docInfo.name}</h1>
-                <CheckCircle className={`w-6 h-6 ${docInfo.available ? (isNight ? 'text-white' : 'text-blue-600') : (isNight ? 'text-zinc-700' : 'text-gray-300')}`} />
+                {docInfo.available ?
+                  <CheckCircle className={`w-6 h-6 ${isNight ? 'text-white' : 'text-blue-600'}`} /> :
+                  <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                    <span className="text-red-400 text-[10px] font-bold uppercase tracking-widest">Offline</span>
+                  </div>
+                }
               </div>
               <p className={`text-lg md:text-xl font-light ${isNight ? 'text-zinc-500' : 'text-gray-500'}`}>{docInfo.speciality}{docInfo.degree ? ` \u2022 ${docInfo.degree}` : ''}</p>
             </div>
@@ -200,7 +206,7 @@ const Appointment = () => {
               </div>
               <div className="space-y-1">
                 <p className={`text-[10px] uppercase tracking-widest font-bold ${isNight ? 'text-zinc-500' : 'text-gray-400'}`}>Consultation</p>
-                <p className={`font-medium flex items-center gap-2 ${isNight ? 'text-white' : 'text-gray-900'}`}><DollarSign className={`w-4 h-4 ${isNight ? 'text-zinc-600' : 'text-gray-400'}`} /> ₹{docInfo.fees}</p>
+                <p className={`font-medium flex items-center gap-2 ${isNight ? 'text-white' : 'text-gray-900'}`}>₹{docInfo.fees}</p>
               </div>
               <div className="space-y-1">
                 <p className={`text-[10px] uppercase tracking-widest font-bold ${isNight ? 'text-zinc-500' : 'text-gray-400'}`}>Patients</p>
@@ -248,7 +254,7 @@ const Appointment = () => {
                       key={i}
                       onClick={() => setSlotIndex(i)}
                       className={`flex flex-col items-center gap-2 px-6 py-8 rounded-3xl border transition-all min-w-[100px] ${i === slotIndex
-                        ? (isNight ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.1)]" : "bg-[#111827] text-white border-[#111827] shadow-[0_8px_30px_rgb(0,0,0,0.12)]")
+                        ? (isNight ? "bg-[#ebebeb] text-black border-[#ebebeb] shadow-[0_0_20px_rgba(255,255,255,0.1)]" : "bg-[#111827] text-white border-[#111827] shadow-[0_8px_30px_rgb(0,0,0,0.12)]")
                         : (isNight ? "bg-white/5 text-zinc-500 border-white/5 hover:border-white/10" : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-100")
                         }`}
                     >
@@ -269,10 +275,10 @@ const Appointment = () => {
                         key={i}
                         onClick={() => available && setSlotTime(slot.time)}
                         className={`px-6 py-4 rounded-2xl text-xs font-bold transition-all border ${slot.time === slotTime && available
-                          ? (isNight ? "bg-white text-black border-white" : "bg-gray-900 text-white border-gray-900")
+                          ? (isNight ? "bg-[#ebebeb] text-black border-[#ebebeb]" : "bg-gray-900 text-white border-gray-900")
                           : available
                             ? (isNight ? "bg-white/5 text-zinc-400 border-white/5 hover:border-white/20" : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50")
-                            : `opacity-20 cursor-not-allowed border-none ${isNight ? 'text-zinc-700' : 'text-gray-400'}`
+                            : `bg-white/[0.02] text-zinc-600 border border-white/5 cursor-not-allowed overflow-hidden relative after:content-[''] after:absolute after:inset-0 after:bg-[linear-gradient(to_top_left,transparent_45%,rgba(255,255,255,0.1)_45%,rgba(255,255,255,0.1)_55%,transparent_55%)]`
                           }`}
                       >
                         {slot.time}
@@ -310,11 +316,11 @@ const Appointment = () => {
                 onClick={bookAppointment}
                 disabled={!docInfo.available}
                 className={`w-full py-5 rounded-[40px] text-[10px] uppercase tracking-[0.3em] font-bold transition-all ${isNight
-                  ? 'bg-[#1a1a1a] text-white hover:bg-[#2a2a2a]'
+                  ? 'bg-[#ebebeb] text-black hover:bg-zinc-200'
                   : 'bg-[#111827] text-white hover:bg-[#1f2937]'
-                  } ${!docInfo.available && 'opacity-50 cursor-not-allowed'}`}
+                  } ${!docInfo.available && 'opacity-20 cursor-not-allowed grayscale'}`}
               >
-                Secure Appointment
+                {docInfo.available ? "Secure Appointment" : "Doctor Currently Offline"}
               </button>
 
               <p className={`text-[10px] text-center leading-relaxed uppercase ${isNight ? 'text-zinc-600' : 'text-gray-400'}`}>

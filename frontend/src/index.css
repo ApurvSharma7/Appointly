@@ -7,7 +7,7 @@
 :root {
   --bg-primary: #000000;
   --bg-card: #0a0a0a;
-  --text-main: #ffffff;
+  --text-main: #ebebeb;
   --text-secondary: #a1a1aa;
   --border-color: #1a1a1a;
   --accent: #4ca6a3;
@@ -17,7 +17,7 @@
 .night {
   --bg-primary: #000000;
   --bg-card: #000000;
-  --text-main: #ffffff;
+  --text-main: #ebebeb;
   --text-secondary: #a1a1aa;
   --border-color: #1a1a1a;
   --accent: #4ca6a3;
