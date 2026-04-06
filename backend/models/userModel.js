@@ -11,6 +11,12 @@ const userSchema = new mongoose.Schema(
       default:
         "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=256&auto=format&fit=crop&q=60",
     },
+    phone: { type: String, default: "" },
+    address: { type: Object, default: { line1: "", line2: "" } },
+    gender: { type: String, default: "not selected" },
+    dob: { type: String, default: "" },
+    googleId: { type: String, unique: true, sparse: true },
+    isGoogleUser: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

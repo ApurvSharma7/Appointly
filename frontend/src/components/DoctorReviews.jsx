@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { Star, PenLine, MessageSquare } from 'lucide-react';
+import { AppContext } from '../context/AppContext';
 
 const DoctorReviews = ({ doctorId }) => {
   const [reviews, setReviews] = useState([]);
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { theme } = useContext(AppContext);
+  const isNight = theme === 'night';
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -21,32 +25,31 @@ const DoctorReviews = ({ doctorId }) => {
         setLoading(false);
       }
     };
-
     fetchReviews();
   }, [doctorId]);
 
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <span
-        key={index}
-        className={`text-lg ${
-          index < rating ? 'text-yellow-400' : 'text-gray-300'
-        }`}
-      >
-        ★
-      </span>
-    ));
-  };
+  const StarRow = ({ rating, size = 'sm' }) => (
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }, (_, i) => (
+        <Star
+          key={i}
+          className={`${size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} ${
+            i < rating
+              ? 'fill-yellow-400 text-yellow-400'
+              : isNight ? 'fill-white/10 text-white/10' : 'fill-gray-200 text-gray-200'
+          }`}
+        />
+      ))}
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-lg">
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded mb-4"></div>
-          <div className="space-y-3">
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          </div>
+      <div className={`rounded-[40px] p-8 md:p-12 border animate-pulse ${isNight ? 'bg-[#0a0a0a] border-white/5' : 'bg-white border-gray-200'}`}>
+        <div className="space-y-4">
+          <div className={`h-5 w-32 rounded-full ${isNight ? 'bg-white/10' : 'bg-gray-100'}`} />
+          <div className={`h-4 w-full rounded-full ${isNight ? 'bg-white/5' : 'bg-gray-50'}`} />
+          <div className={`h-4 w-2/3 rounded-full ${isNight ? 'bg-white/5' : 'bg-gray-50'}`} />
         </div>
       </div>
     );
@@ -56,63 +59,75 @@ const DoctorReviews = ({ doctorId }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl p-6 shadow-lg"
+      className={`rounded-[40px] p-8 md:p-12 border ${isNight ? 'bg-[#0a0a0a] border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.8)]' : 'bg-white border-gray-200 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'}`}
     >
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-bold text-gray-800">Patient Reviews</h3>
-        {doctor && (
-          <div className="text-right">
-            <div className="flex items-center space-x-2">
-              <div className="flex">
-                {renderStars(Math.round(doctor.averageRating))}
-              </div>
-              <span className="text-lg font-semibold text-gray-700">
+      {/* Header */}
+      <div className={`flex items-center justify-between pb-8 border-b ${isNight ? 'border-white/5' : 'border-gray-100'}`}>
+        <div className="flex items-center gap-3">
+          <MessageSquare className={`w-5 h-5 ${isNight ? 'text-zinc-500' : 'text-gray-400'}`} />
+          <h3 className={`text-2xl font-bold ${isNight ? 'text-white' : 'text-gray-900'}`}>
+            Patient Reviews
+          </h3>
+        </div>
+        {doctor && doctor.totalRatings > 0 && (
+          <div className="flex items-center gap-3">
+            <StarRow rating={Math.round(doctor.averageRating)} size="md" />
+            <div className="text-right">
+              <p className={`text-lg font-bold leading-none ${isNight ? 'text-white' : 'text-gray-900'}`}>
                 {doctor.averageRating.toFixed(1)}
-              </span>
+              </p>
+              <p className={`text-[10px] uppercase tracking-widest font-bold mt-1 ${isNight ? 'text-zinc-500' : 'text-gray-400'}`}>
+                {doctor.totalRatings} review{doctor.totalRatings !== 1 ? 's' : ''}
+              </p>
             </div>
-            <p className="text-sm text-gray-500">
-              Based on {doctor.totalRatings} review{doctor.totalRatings !== 1 ? 's' : ''}
-            </p>
           </div>
         )}
       </div>
 
+      {/* Empty State */}
       {reviews.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="text-gray-400 text-6xl mb-4">⭐</div>
-          <p className="text-gray-500 text-lg">No reviews yet</p>
-          <p className="text-gray-400 text-sm">Be the first to share your experience!</p>
+        <div className={`mt-8 flex flex-col items-center justify-center gap-4 py-14 rounded-3xl border-2 border-dashed transition-colors
+          ${isNight ? 'border-white/5' : 'border-gray-100'}`}>
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isNight ? 'bg-white/5' : 'bg-gray-50'}`}>
+            <PenLine className={`w-5 h-5 ${isNight ? 'text-zinc-600' : 'text-gray-300'}`} />
+          </div>
+          <div className="text-center space-y-1">
+            <p className={`font-semibold ${isNight ? 'text-zinc-400' : 'text-gray-500'}`}>No reviews yet</p>
+            <p className={`text-sm ${isNight ? 'text-zinc-600' : 'text-gray-300'}`}>
+              Book an appointment to leave the first review
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="mt-8 space-y-4">
           {reviews.map((review, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="border-b border-gray-100 pb-4 last:border-b-0"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.07 }}
+              className={`p-6 rounded-3xl border transition-colors ${isNight ? 'bg-white/[0.02] border-white/5' : 'bg-gray-50 border-gray-100'}`}
             >
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                  <span className="text-gray-600 font-semibold text-sm">
-                    {review.userId?.name?.charAt(0)?.toUpperCase() || 'U'}
-                  </span>
+              <div className="flex items-start gap-4">
+                {/* Avatar Initial */}
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm
+                  ${isNight ? 'bg-white/10 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                  {review.userId?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="font-semibold text-gray-800">
-                      {review.userId?.name || 'Anonymous'}
-                    </span>
-                    <div className="flex">
-                      {renderStars(review.rating)}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <span className={`font-bold text-sm ${isNight ? 'text-white' : 'text-gray-900'}`}>
+                        {review.userId?.name || 'Anonymous'}
+                      </span>
+                      <StarRow rating={review.rating} />
                     </div>
-                    <span className="text-sm text-gray-500">
-                      {new Date(review.ratedAt).toLocaleDateString()}
+                    <span className={`text-[10px] font-bold uppercase tracking-widest shrink-0 ${isNight ? 'text-zinc-600' : 'text-gray-300'}`}>
+                      {new Date(review.ratedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </div>
                   {review.feedback && (
-                    <p className="text-gray-600 text-sm leading-relaxed">
+                    <p className={`text-sm leading-relaxed ${isNight ? 'text-zinc-400' : 'text-gray-600'}`}>
                       {review.feedback}
                     </p>
                   )}

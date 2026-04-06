@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-toastify';
 import axios from 'axios';
+import { AppContext } from '../context/AppContext';
 
 const RatingModal = ({ isOpen, onClose, appointmentId, doctorName, onRatingSubmitted }) => {
+  const { theme, backendUrl, token } = useContext(AppContext);
+  const isNight = theme === 'night';
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -10,17 +14,16 @@ const RatingModal = ({ isOpen, onClose, appointmentId, doctorName, onRatingSubmi
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (rating === 0) {
-      alert('Please select a rating');
+      toast.error('Please select a rating');
       return;
     }
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/user/rate-doctor',
+        `${backendUrl}/api/user/rate-doctor`,
         {
           appointmentId,
           rating,
@@ -32,17 +35,18 @@ const RatingModal = ({ isOpen, onClose, appointmentId, doctorName, onRatingSubmi
       );
 
       if (response.data.success) {
-        alert('✅ Rating submitted successfully!');
+        toast.success(response.data.message || 'Rating submitted successfully!');
         onRatingSubmitted();
         onClose();
         setRating(0);
         setFeedback('');
       } else {
-        alert('❌ Failed to submit rating');
+        toast.error(response.data.message || 'Failed to submit rating');
       }
     } catch (error) {
       console.error('Rating submission error:', error);
-      alert('❌ Failed to submit rating');
+      const errorMsg = error.response?.data?.message || 'Failed to submit rating';
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -69,24 +73,30 @@ const RatingModal = ({ isOpen, onClose, appointmentId, doctorName, onRatingSubmi
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            className={`rounded-[40px] p-10 w-full max-w-md border shadow-2xl relative overflow-hidden transition-colors duration-500
+              ${isNight ? 'bg-[#0a0a0a] border-white/5' : 'bg-white border-slate-100'}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Rate Your Experience</h2>
+            {/* Background Accent for Dark Mode */}
+            {isNight && <div className="absolute top-0 right-0 w-32 h-32 bg-[#4ca6a3]/5 blur-[80px] rounded-full pointer-events-none"></div>}
+
+            <div className="flex justify-between items-center mb-10 relative z-10 font-inter">
+              <h2 className={`text-3xl font-bold tracking-tight ${isNight ? 'text-white' : 'text-slate-900'}`}>
+                Rate Your <span className="italic text-[#4ca6a3]">Experience</span>
+              </h2>
               <button
                 onClick={handleClose}
-                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                className={`text-2xl transition-colors ${isNight ? 'text-zinc-700 hover:text-white' : 'text-slate-300 hover:text-slate-900'}`}
               >
                 ×
               </button>
             </div>
 
-            <div className="mb-6">
-              <p className="text-gray-600 mb-4">
-                How was your appointment with <span className="font-semibold">Dr. {doctorName}</span>?
+            <div className="mb-10 relative z-10">
+              <p className={`text-sm font-light mb-6 ${isNight ? 'text-zinc-500' : 'text-slate-500'}`}>
+                How was your appointment with <span className={`font-semibold ${isNight ? 'text-zinc-300' : 'text-slate-900'}`}>{doctorName}</span>?
               </p>
-              
+
               {/* Star Rating */}
               <div className="flex justify-center space-x-2 mb-4">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -96,11 +106,10 @@ const RatingModal = ({ isOpen, onClose, appointmentId, doctorName, onRatingSubmi
                     onClick={() => setRating(star)}
                     onMouseEnter={() => setHoveredRating(star)}
                     onMouseLeave={() => setHoveredRating(0)}
-                    className={`text-4xl transition-colors duration-200 ${
-                      star <= (hoveredRating || rating)
-                        ? 'text-yellow-400'
-                        : 'text-gray-300'
-                    } hover:text-yellow-400`}
+                    className={`text-4xl transition-colors duration-200 ${star <= (hoveredRating || rating)
+                      ? 'text-yellow-400'
+                      : 'text-gray-300'
+                      } hover:text-yellow-400`}
                   >
                     ★
                   </button>
@@ -120,43 +129,52 @@ const RatingModal = ({ isOpen, onClose, appointmentId, doctorName, onRatingSubmi
             </div>
 
             {/* Feedback */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-8 relative z-10">
+              <label className={`block text-[10px] uppercase tracking-[0.2em] font-black mb-3 ${isNight ? 'text-zinc-600' : 'text-slate-400'}`}>
                 Share your feedback (optional)
               </label>
               <textarea
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Tell us about your experience..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none"
+                className={`w-full p-5 border rounded-3xl transition-all duration-300 resize-none text-sm leading-relaxed
+                  ${isNight
+                    ? 'bg-white/5 border-white/5 text-white placeholder-zinc-700 focus:border-[#4ca6a3]/30 focus:bg-white/[0.07]'
+                    : 'bg-slate-50 border-slate-100 text-slate-900 placeholder-slate-300 focus:border-[#4ca6a3]/30 focus:bg-white'}`}
                 rows="4"
                 maxLength="500"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className={`text-[9px] uppercase tracking-widest font-black mt-2 text-right ${isNight ? 'text-zinc-800' : 'text-slate-200'}`}>
                 {feedback.length}/500 characters
               </p>
             </div>
 
             {/* Submit Button */}
-            <div className="flex space-x-3">
+            <div className="relative z-10 flex gap-4">
               <button
-                type="button"
                 onClick={handleClose}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className={`flex-1 py-4 rounded-3xl text-[10px] uppercase tracking-[0.3em] font-black transition-all
+                  ${isNight
+                    ? 'bg-white/5 text-zinc-500 hover:bg-white/10 hover:text-white'
+                    : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                Cancel
+                Discard
               </button>
               <button
-                type="button"
                 onClick={handleSubmit}
-                disabled={loading || rating === 0}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  loading || rating === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-black text-white hover:bg-gray-800'
-                }`}
+                disabled={loading}
+                className={`flex-[2] py-4 rounded-3xl font-black text-[10px] uppercase tracking-[0.3em] transition-all relative overflow-hidden group
+                  ${isNight ? 'bg-white text-black hover:bg-zinc-200' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200'}`}
               >
-                {loading ? 'Submitting...' : 'Submit Rating'}
+                {loading ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-current border-t-transparent rounded-full mx-auto"
+                  />
+                ) : (
+                  'Submit Evaluation'
+                )}
               </button>
             </div>
           </motion.div>

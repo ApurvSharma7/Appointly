@@ -4,7 +4,8 @@ import group_profiles from './group_profiles.png'
 import profile_pic from './profile_pic.png'
 import contact_image from './contact_image.png'
 import about_image from './about_image.png'
-import logo from './logo.svg'
+import logo from './appointly-logo.png'
+import appointly_header_logo from './appointly-header-logo.png'
 import dropdown_icon from './dropdown_icon.svg'
 import menu_icon from './menu_icon.svg'
 import cross_icon from './cross_icon.png'
@@ -36,13 +37,18 @@ import General_physician from './General_physician.svg'
 import Gynecologist from './Gynecologist.svg'
 import Neurologist from './Neurologist.svg'
 import Pediatricians from './Pediatricians.svg'
+import doctor_illu from './doctor-illu.png'
+import doctor_illu_night from './doctor-illu-night.png'
 
+import undraw_doctors_djoj from './undraw_doctors_djoj.svg'
 
 export const assets = {
+    undraw_doctors_djoj,
     appointment_img,
     header_img,
     group_profiles,
-    logo,
+    logo: appointly_header_logo,
+    header_logo: appointly_header_logo,
     chats_icon,
     verified_icon,
     info_icon,
@@ -55,7 +61,24 @@ export const assets = {
     dropdown_icon,
     upload_icon,
     stripe_logo,
-    razorpay_logo
+    razorpay_logo,
+    doctor_illu,
+    doctor_illu_night,
+    doc1,
+    doc2,
+    doc3,
+    doc4,
+    doc5,
+    doc6,
+    doc7,
+    doc8,
+    doc9,
+    doc10,
+    doc11,
+    doc12,
+    doc13,
+    doc14,
+    doc15
 }
 
 export const specialityData = [

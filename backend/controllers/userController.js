@@ -12,8 +12,11 @@ import User from "../models/userModel.js";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
 import sendEmail from "../config/nodemailer.js";
+import { OAuth2Client } from "google-auth-library";
 
 dotenv.config();
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // ================== Helpers ==================
 
@@ -35,7 +38,10 @@ export const registerUser = async (req, res) => {
       return res.status(409).json({ success: false, message: "Email already registered" });
     }
 
-    const user = await User.create({ name, email, password });
+    // Generate a unique, random avatar based on the user's name using DiceBear
+    const generatedImage = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name)}&backgroundColor=000000,1a1a1a&rowColor=ffffff`;
+
+    const user = await User.create({ name, email, password, image: generatedImage });
 
     const token = signToken(user._id);
 
@@ -71,6 +77,56 @@ export const loginUser = async (req, res) => {
   } catch (err) {
     console.error("❌ Login error:", err);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// @desc Google Login
+// @route POST /api/user/google-login
+export const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { name, email, picture, sub } = payload;
+
+    let user = await User.findOne({ email });
+
+    const finalImage = picture || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name || email)}&backgroundColor=000000,1a1a1a&rowColor=ffffff`;
+
+    if (!user) {
+      // Create user if doesn't exist
+      user = await User.create({
+        name,
+        email,
+        image: finalImage,
+        googleId: sub,
+        isGoogleUser: true,
+        // No password needed for Google users
+        password: crypto.randomBytes(16).toString("hex"), 
+      });
+    } else if (!user.isGoogleUser) {
+      // If user exists with email but not Google, link them
+      user.googleId = sub;
+      user.isGoogleUser = true;
+      if (!user.image || user.image.includes("unsplash.com")) {
+        user.image = finalImage;
+      }
+      await user.save();
+    }
+
+    const jwtToken = signToken(user._id);
+
+    res.json({
+      success: true,
+      token: jwtToken,
+      user: { _id: user._id, name: user.name, email: user.email, image: user.image },
+    });
+  } catch (err) {
+    console.error("❌ Google Login error:", err);
+    res.status(401).json({ success: false, message: "Google authentication failed" });
   }
 };
 
@@ -393,15 +449,22 @@ export const cancelAppointment = async (req, res) => {
 
 export const paymentRazorpay = async (req, res) => {
   try {
+    const { appointmentId } = req.body;
+    const appointment = await appointmentModel.findById(appointmentId).populate("docId");
+
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
       key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
 
     const options = {
-      amount: req.body.amount * 100, // INR → paise
+      amount: appointment.docId.fees * 100, // Doctor fee in INR → paise
       currency: "INR",
-      receipt: `receipt_${Date.now()}`,
+      receipt: `receipt_${appointmentId}`,
     };
 
     const order = await razorpay.orders.create(options);
@@ -430,7 +493,7 @@ export const verifyRazorpay = async (req, res) => {
 
     if (expectedSignature === razorpay_signature) {
       // ✅ Update appointment payment
-      await Appointment.findByIdAndUpdate(appointmentId, {
+      await appointmentModel.findByIdAndUpdate(appointmentId, {
         paymentStatus: "Paid",
         transactionId: razorpay_payment_id,
       });
@@ -450,21 +513,28 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const paymentStripe = async (req, res) => {
   try {
+    const { appointmentId } = req.body;
+    const appointment = await appointmentModel.findById(appointmentId).populate("docId");
+
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
             currency: "inr",
-            product_data: { name: req.body.productName || "Doctor Appointment" },
-            unit_amount: req.body.amount * 100,
+            product_data: { name: `Doctor Appointment: ${appointment.docId.name}` },
+            unit_amount: appointment.docId.fees * 100,
           },
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/payment-success`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment-failed`,
+      success_url: `${process.env.FRONTEND_URL}/verify?item=${appointmentId}&success=true`,
+      cancel_url: `${process.env.FRONTEND_URL}/verify?item=${appointmentId}&success=false`,
     });
 
     res.json({ success: true, id: session.id });
@@ -516,6 +586,9 @@ export const getDoctorSlots = async (req, res) => {
           _id: doctor._id,
           name: doctor.name,
           speciality: doctor.speciality,
+          degree: doctor.degree,
+          experience: doctor.experience,
+          about: doctor.about,
           available: doctor.available,
           fees: doctor.fees,
           image: doctor.image,

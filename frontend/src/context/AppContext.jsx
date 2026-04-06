@@ -115,9 +115,6 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
-  // -----------------------------
-  // Login
-  // -----------------------------
   const loginUser = async (formData) => {
     try {
       const { data } = await axios.post(`${backendUrl}/api/user/login`, formData);
@@ -135,15 +132,44 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
-  // -----------------------------
-  // Init - fetch doctors & profile on load
-  // -----------------------------
+  const googleLogin = async (googleToken) => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/user/google-login`, { token: googleToken });
+
+      if (data.success && data.token) {
+        handleAuth(data.token);
+        toast.success("Google Login successful");
+        navigate("/");
+      } else {
+        toast.error(data.message || "Google Login failed");
+      }
+    } catch (err) {
+      console.error("❌ Google Login error:", err);
+      toast.error(err.response?.data?.message || "Google Login error");
+    }
+  };
+
   useEffect(() => {
     getDoctorsData();
     if (token) {
       getProfile(token);
     }
   }, [token]);
+
+  // -----------------------------
+  // Theme Management
+  // -----------------------------
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "day");
+
+  const toggleTheme = () => {
+    const newTheme = theme === "day" ? "night" : "day";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
 
   return (
     <AppContext.Provider
@@ -159,6 +185,10 @@ const AppContextProvider = ({ children }) => {
         getDoctorsData,
         registerUser,
         loginUser,
+        googleLogin,
+        theme,
+        setTheme,
+        toggleTheme,
       }}
     >
       {children}

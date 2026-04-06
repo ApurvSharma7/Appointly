@@ -2,6 +2,7 @@ import express from "express";
 import {
   registerUser,
   loginUser,
+  googleLogin,
   getProfile,
   logoutUser,
   bookAppointment,
@@ -24,6 +25,7 @@ const router = express.Router();
 // Auth
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/google-login", googleLogin);
 router.post("/logout", authUser, logoutUser);
 
 router.get("/profile", authUser, getProfile);

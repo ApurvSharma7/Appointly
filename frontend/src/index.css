@@ -1,17 +1,201 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Young+Serif&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-primary: #000000;
+  --bg-card: #0a0a0a;
+  --text-main: #ffffff;
+  --text-secondary: #a1a1aa;
+  --border-color: #1a1a1a;
+  --accent: #4ca6a3;
+}
+
+/* Night Theme Override */
+.night {
+  --bg-primary: #000000;
+  --bg-card: #000000;
+  --text-main: #ffffff;
+  --text-secondary: #a1a1aa;
+  --border-color: #1a1a1a;
+  --accent: #4ca6a3;
+
+  /* Gooey Nav (Night Mode) */
+  --gooey-bg: #000000;
+  --gooey-fg: #ffffff;
+  --gooey-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
+  --gooey-blend: lighten;
+}
+
+.day {
+  --bg-primary: #ffffff;
+  --bg-card: #f9fafb;
+  --text-main: #000000;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --accent: #4ca6a3;
+
+  /* Gooey Nav (Day Mode) */
+  --gooey-bg: #ffffff;
+  --gooey-fg: #000000;
+  --gooey-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  --gooey-blend: darken;
+}
+
 * {
-    font-family: Outfit;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.active hr {
-    @apply block
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+.young-serif {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* Typography Styling */
+.hero-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--text-card);
+  font-weight: 600;
+  transition: color 0.5s ease;
+}
+
+.hero-title em {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* Effecto Container Shape */
+.effecto-main-card {
+  background-color: var(--bg-card);
+  border-radius: 40px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 85vh;
+  display: flex;
+  transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Buttons */
+.btn-effecto-black {
+  background-color: #000000;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 12px 28px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-effecto-white {
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 6px;
+  padding: 12px 28px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-effecto-black:hover {
+  opacity: 0.9;
+}
+
+.btn-effecto-white:hover {
+  background-color: #f3f4f6;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-    @apply hidden
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+
+
+/* ── View Transition: GPU-composited ripple ───────────────────────────── */
+::view-transition-group(root) {
+  animation-duration: 0s;
+}
+
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  z-index: 2;
+  will-change: clip-path;
+}
+
+/* ── Hero image CSS switching (no React re-render during transition) ─── */
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+
+.hero-img-day {
+  opacity: 1;
+}
+
+.hero-img-night {
+  opacity: 0;
+}
+
+.night .hero-img-day {
+  opacity: 0;
+}
+
+.night .hero-img-night {
+  opacity: 1;
+}
+
+.day .hero-img-day {
+  opacity: 1;
+}
+
+.day .hero-img-night {
+  opacity: 0;
+}
+
+/* Hide Razorpay Test Mode Ribbon */
+.razorpay-test-mode-label,
+.rzp-test-label,
+[class*="razorpay-test-mode"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

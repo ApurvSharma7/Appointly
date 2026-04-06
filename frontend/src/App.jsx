@@ -21,7 +21,7 @@ import PublicRoute from './components/PublicRoute'
 
 const App = () => {
   return (
-    <div>
+    <div className='bg-[var(--bg-primary)] min-h-screen transition-colors duration-500'>
       <ToastContainer />
       <Navbar />
 
@@ -37,30 +37,9 @@ const App = () => {
         />
 
         {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/doctors"
-          element={
-            <PrivateRoute>
-              <Doctors />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/doctors/:speciality"
-          element={
-            <PrivateRoute>
-              <Doctors />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/" element={<Home />} />
+        <Route path="/doctors" element={<Doctors />} />
+        <Route path="/doctors/:speciality" element={<Doctors />} />
         <Route
           path="/appointment/:docId"
           element={
@@ -85,22 +64,8 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/about"
-          element={
-            <PrivateRoute>
-              <About />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/contact"
-          element={
-            <PrivateRoute>
-              <Contact />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route
           path="/verify"
           element={
@@ -120,7 +85,6 @@ const App = () => {
           }
         />
       </Routes>
-
       <Footer />
     </div>
   )

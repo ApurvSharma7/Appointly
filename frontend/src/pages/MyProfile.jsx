@@ -4,29 +4,29 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { assets } from "../assets/assets";
 
+
 const MyProfile = () => {
-  const { token, backendUrl, userData, setUserData } = useContext(AppContext);
+  const { token, backendUrl, userData, setUserData, theme, toggleTheme } = useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
   const [image, setImage] = useState(null);
   const [localUser, setLocalUser] = useState({
     name: "",
     phone: "",
     address: { line1: "", line2: "" },
-    gender: "Not Selected",
+    gender: "not selected",
     dob: "",
     email: "",
     image: "",
   });
   const [loading, setLoading] = useState(true);
 
-  // Initialize local state safely
   useEffect(() => {
     if (userData) {
       setLocalUser({
         name: userData.name || "",
         phone: userData.phone || "",
         address: userData.address || { line1: "", line2: "" },
-        gender: userData.gender || "Not Selected",
+        gender: userData.gender || "not selected",
         dob: userData.dob || "",
         email: userData.email || "",
         image: userData.image || "",
@@ -35,7 +35,6 @@ const MyProfile = () => {
     }
   }, [userData]);
 
-  // Update profile
   const handleUpdateProfile = async () => {
     try {
       const formData = new FormData();
@@ -51,13 +50,8 @@ const MyProfile = () => {
       });
 
       if (data.success) {
-        toast.success("Profile updated successfully!");
-        const updatedUser = {
-          ...localUser,
-          image: image ? URL.createObjectURL(image) : localUser.image,
-        };
-        setUserData(updatedUser);
-        localStorage.setItem("userData", JSON.stringify(updatedUser));
+        toast.success("profile updated");
+        setUserData(data.user);
         setIsEdit(false);
         setImage(null);
       } else {
@@ -65,133 +59,198 @@ const MyProfile = () => {
       }
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Update failed");
+      toast.error(err.response?.data?.message || "update failed");
     }
   };
 
-  if (loading) return <p className="text-center mt-20 text-gray-500">Loading profile...</p>;
+  if (loading) return (
+    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full bg-[var(--text-main)] animate-pulse"></div>
+    </div>
+  );
 
   return (
-    <div className="max-w-xl mx-auto mt-8 p-6 bg-white rounded-2xl shadow-md flex flex-col gap-6">
-      {/* PROFILE IMAGE */}
-      <div className="flex flex-col items-center">
-        <label htmlFor="image" className="cursor-pointer relative">
-          <img
-            src={image ? URL.createObjectURL(image) : localUser.image || assets.default_profile}
-            alt="Profile"
-            className="w-36 h-36 rounded-full object-cover border-2 border-gray-200 shadow-sm hover:opacity-80 transition-opacity duration-300"
-          />
-          {isEdit && !image && (
-            <img src={assets.upload_icon} alt="Upload" className="w-10 h-10 absolute bottom-2 right-2" />
-          )}
-          <input type="file" id="image" hidden onChange={(e) => setImage(e.target.files[0])} />
-        </label>
-
-        {isEdit ? (
-          <input
-            type="text"
-            value={localUser.name}
-            placeholder="Your Name"
-            onChange={(e) => setLocalUser((prev) => ({ ...prev, name: e.target.value }))}
-            className="mt-4 text-2xl font-semibold text-gray-800 rounded-lg px-3 py-1 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary transition"
-          />
-        ) : (
-          <p className="mt-4 text-2xl font-semibold text-gray-800">{localUser.name}</p>
-        )}
+    <div className="flex flex-col items-center justify-center w-full h-svh overflow-hidden bg-[var(--bg-primary)] px-4 font-inter text-[var(--text-main)] selection:bg-[var(--text-main)] selection:text-[var(--bg-primary)] transition-colors duration-500">
+      <div className="text-center mb-0 mt-8">
+        <h1 className={`text-4xl md:text-5xl font-bold tracking-tight ${theme === "night" ? "text-white" : "text-slate-900"}`}>
+          My <span className="italic text-[#4ca6a3]">Profile</span>
+        </h1>
       </div>
+      <div className="w-full max-w-5xl flex flex-col md:flex-row items-stretch justify-center px-4 md:px-10 gap-12 md:gap-10 pt-10 relative">
 
-      <hr className="border-gray-200" />
-
-      {/* CONTACT INFO */}
-      <div className="space-y-3">
-        <h3 className="text-gray-500 font-medium tracking-wide">Contact Information</h3>
-        <div className="grid grid-cols-[1fr_2fr] gap-y-3 gap-x-4 text-gray-700">
-          <span className="font-medium">Email:</span>
-          <span className="text-gray-500">{localUser.email}</span>
-
-          <span className="font-medium">Phone:</span>
-          {isEdit ? (
-            <input
-              type="text"
-              value={localUser.phone}
-              onChange={(e) => setLocalUser((prev) => ({ ...prev, phone: e.target.value }))}
-              className="bg-gray-100 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary transition"
+        {/* Left Column: Avatar & Name */}
+        <div className="w-full md:w-1/3 flex flex-col justify-center items-center gap-6 shrink-0 md:pr-10 md:py-10 md:border-r border-[var(--border-color)]">
+          <div className="w-36 h-36 rounded-full overflow-hidden bg-[rgba(128,128,128,0.1)] relative border border-[var(--border-color)] shadow-sm">
+            <img
+              src={
+                image ? URL.createObjectURL(image)
+                  : localUser.image
+                    ? (localUser.image.startsWith("http") ? localUser.image : backendUrl + localUser.image)
+                    : assets.default_user
+              }
+              alt="profile"
+              className="w-full h-full object-cover"
             />
-          ) : (
-            <span className="text-gray-600">{localUser.phone}</span>
-          )}
+            {isEdit && (
+              <label className="absolute inset-0 bg-black/50 cursor-pointer flex items-center justify-center backdrop-blur-[2px] transition-colors hover:bg-black/60 text-white">
+                <span className="text-sm font-medium">change</span>
+                <input type="file" hidden onChange={e => setImage(e.target.files[0])} />
+              </label>
+            )}
+          </div>
 
-          <span className="font-medium">Address:</span>
-          {isEdit ? (
-            <div className="flex flex-col gap-1">
+          <div className="flex flex-col w-full items-center mt-2">
+            {isEdit ? (
               <input
-                type="text"
-                value={localUser.address.line1 || ""}
-                placeholder="Address Line 1"
-                onChange={(e) =>
-                  setLocalUser((prev) => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))
-                }
-                className="bg-gray-100 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary transition"
+                value={localUser.name}
+                onChange={e => setLocalUser({ ...localUser, name: e.target.value })}
+                className={`text-2xl font-bold backdrop-blur-md rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.05)] px-6 py-2 text-center outline-none w-full border-none transition-all ${theme === "night"
+                  ? "bg-[rgba(255,255,255,0.05)] text-white focus:bg-[rgba(255,255,255,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+                  : "bg-[rgba(0,0,0,0.05)] text-black focus:bg-[rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+                  }`}
+                placeholder="your name"
               />
-              <input
-                type="text"
-                value={localUser.address.line2 || ""}
-                placeholder="Address Line 2"
-                onChange={(e) =>
-                  setLocalUser((prev) => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))
-                }
-                className="bg-gray-100 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary transition"
-              />
+            ) : (
+              <h1 className="text-3xl lg:text-4xl font-bold text-[var(--text-main)] tracking-tight text-center">
+                {localUser.name || "not provided"}
+              </h1>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Information & Actions */}
+        <div className="w-full md:w-2/3 flex flex-col justify-start gap-8">
+
+          {/* contact information */}
+          <div className="flex flex-col gap-5">
+            <h2 className="text-lg font-medium text-[var(--text-secondary)] border-b border-[var(--border-color)] pb-2 mb-2">contact information</h2>
+
+            <div className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4 items-center">
+              <span className="text-[var(--text-main)] font-medium">email:</span>
+              <span className="text-[#3b82f6] text-base">{localUser.email}</span>
             </div>
-          ) : (
-            <span className="text-gray-600">
-              {localUser.address.line1 || ""} <br /> {localUser.address.line2 || ""}
-            </span>
-          )}
+
+            <div className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4 items-center">
+              <span className="text-[var(--text-main)] font-medium">phone:</span>
+              {isEdit ? (
+                <input
+                  className={`backdrop-blur-md rounded-[24px] px-5 py-2.5 outline-none w-full border-none transition-all ${theme === "night"
+                    ? "bg-[rgba(255,255,255,0.05)] text-white focus:bg-[rgba(255,255,255,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+                    : "bg-[rgba(0,0,0,0.05)] text-black focus:bg-[rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+                    }`}
+                  value={localUser.phone}
+                  onChange={e => setLocalUser({ ...localUser, phone: e.target.value })}
+                  placeholder="phone number"
+                />
+              ) : (
+                <span className="text-[var(--text-main)] text-base">{localUser.phone || "not provided"}</span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4 items-start">
+              <span className="text-[var(--text-main)] font-medium pt-2">address:</span>
+              {isEdit ? (
+                <div className="flex flex-col gap-3 w-full max-w-[400px]">
+                  <input
+                    className={`backdrop-blur-md rounded-[24px] px-5 py-2.5 outline-none w-full border-none transition-all ${theme === "night"
+                      ? "bg-[rgba(255,255,255,0.05)] text-white focus:bg-[rgba(255,255,255,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+                      : "bg-[rgba(0,0,0,0.05)] text-black focus:bg-[rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+                      }`}
+                    value={localUser.address.line1}
+                    onChange={e => setLocalUser({ ...localUser, address: { ...localUser.address, line1: e.target.value } })}
+                    placeholder="address line 1"
+                  />
+                  <input
+                    className={`backdrop-blur-md rounded-[24px] px-5 py-2.5 outline-none w-full border-none transition-all ${theme === "night"
+                      ? "bg-[rgba(255,255,255,0.05)] text-white focus:bg-[rgba(255,255,255,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+                      : "bg-[rgba(0,0,0,0.05)] text-black focus:bg-[rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+                      }`}
+                    value={localUser.address.line2}
+                    onChange={e => setLocalUser({ ...localUser, address: { ...localUser.address, line2: e.target.value } })}
+                    placeholder="address line 2"
+                  />
+                </div>
+              ) : (
+                <span className="text-[var(--text-main)] text-base pt-2 leading-relaxed">
+                  {localUser.address.line1 || "not provided"} <br />
+                  {localUser.address.line2}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* basic information */}
+          <div className="flex flex-col gap-5 mt-2">
+            <h2 className="text-lg font-medium text-[var(--text-secondary)] border-b border-[var(--border-color)] pb-2 mb-2">basic information</h2>
+
+            <div className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4 items-center">
+              <span className="text-[var(--text-main)] font-medium">gender:</span>
+              {isEdit ? (
+                <select
+                  className={`backdrop-blur-md rounded-[24px] px-5 py-2.5 outline-none w-full max-w-[400px] border-none transition-all appearance-none cursor-pointer ${theme === "night"
+                    ? "bg-[rgba(255,255,255,0.05)] text-white focus:bg-[rgba(255,255,255,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
+                    : "bg-[rgba(0,0,0,0.05)] text-black focus:bg-[rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+                    }`}
+                  value={localUser.gender}
+                  onChange={e => setLocalUser({ ...localUser, gender: e.target.value })}
+                >
+                  <option className="bg-[var(--bg-primary)] text-[var(--text-main)]" value="not selected">not selected</option>
+                  <option className="bg-[var(--bg-primary)] text-[var(--text-main)]" value="male">male</option>
+                  <option className="bg-[var(--bg-primary)] text-[var(--text-main)]" value="female">female</option>
+                  <option className="bg-[var(--bg-primary)] text-[var(--text-main)]" value="other">other</option>
+                </select>
+              ) : (
+                <span className="text-[var(--text-main)] text-base">{localUser.gender}</span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4 items-center">
+              <span className="text-[var(--text-main)] font-medium">birthday:</span>
+              {isEdit ? (
+                <input
+                  type="date"
+                  className={`backdrop-blur-md rounded-[24px] px-5 py-2.5 outline-none w-full max-w-[400px] border-none transition-all ${theme === "night"
+                    ? "bg-[rgba(255,255,255,0.05)] text-white focus:bg-[rgba(255,255,255,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.3)] [color-scheme:dark]"
+                    : "bg-[rgba(0,0,0,0.05)] text-black focus:bg-[rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.05)] [color-scheme:light]"
+                    }`}
+                  value={localUser.dob}
+                  onChange={e => setLocalUser({ ...localUser, dob: e.target.value })}
+                />
+              ) : (
+                <span className="text-[var(--text-main)] text-base">{localUser.dob || "not provided"}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Action Button */}
+          <div className="flex md:justify-start justify-center mt-6 gap-4">
+            {isEdit ? (
+              <>
+                <button
+                  onClick={() => setIsEdit(false)}
+                  className="bg-transparent border border-[var(--border-color)] hover:bg-[rgba(128,128,128,0.1)] text-[var(--text-main)] rounded-[9999px] px-8 py-3 transition-colors outline-none font-medium"
+                >
+                  cancel
+                </button>
+                <button
+                  onClick={handleUpdateProfile}
+                  className="bg-[#1a1a1a] hover:bg-[#2a2a2a] text-[#ffffff] rounded-[9999px] px-8 py-3 transition-colors outline-none font-medium"
+                >
+                  save profile
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsEdit(true)}
+                className="bg-[#1a1a1a] hover:bg-[#2a2a2a] text-[#ffffff] rounded-[9999px] px-10 py-3 font-medium transition-colors outline-none shadow-xl"
+              >
+                edit profile
+              </button>
+            )}
+          </div>
+
         </div>
-      </div>
 
-      {/* BASIC INFO */}
-      <div className="space-y-3">
-        <h3 className="text-gray-500 font-medium tracking-wide">Basic Information</h3>
-        <div className="grid grid-cols-[1fr_2fr] gap-y-3 gap-x-4 text-gray-700">
-          <span className="font-medium">Gender:</span>
-          {isEdit ? (
-            <select
-              value={localUser.gender}
-              onChange={(e) => setLocalUser((prev) => ({ ...prev, gender: e.target.value }))}
-              className="bg-gray-100 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary transition"
-            >
-              <option>Not Selected</option>
-              <option>Male</option>
-              <option>Female</option>
-            </select>
-          ) : (
-            <span className="text-gray-600">{localUser.gender}</span>
-          )}
-
-          <span className="font-medium">Birthday:</span>
-          {isEdit ? (
-            <input
-              type="date"
-              value={localUser.dob || ""}
-              onChange={(e) => setLocalUser((prev) => ({ ...prev, dob: e.target.value }))}
-              className="bg-gray-100 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary transition"
-            />
-          ) : (
-            <span className="text-gray-600">{localUser.dob || ""}</span>
-          )}
-        </div>
-      </div>
-
-      {/* ACTION BUTTON */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={isEdit ? handleUpdateProfile : () => setIsEdit(true)}
-          className="px-8 py-2 rounded-full border border-primary text-primary font-medium hover:bg-primary hover:text-white transition"
-        >
-          {isEdit ? "Save Information" : "Edit Profile"}
-        </button>
       </div>
     </div>
   );
