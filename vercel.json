@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "projects": [
+    {
+      "name": "appointly-frontend",
+      "directory": "frontend"
+    },
+    {
+      "name": "appointly-admin",
+      "directory": "admin"
+    },
+    {
+      "name": "appointly-backend",
+      "directory": "backend"
+    }
+  ]
+}
