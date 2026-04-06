@@ -60,17 +60,17 @@ const Navbar = () => {
       <nav className={`fixed top-0 left-0 w-full z-[2001] transition-all duration-500 border-b
         ${isNight ? 'bg-[#000000] border-white/5' : 'bg-white border-slate-100'}`}>
         <div className="max-w-6xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between relative">
-          
+
           {/* Mobile Menu Toggle (Left) */}
-          <button 
+          <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`md:hidden p-2 rounded-xl border transition-all ${isNight ? 'border-white/10 hover:bg-zinc-900 shadow-sm' : 'border-slate-100 hover:bg-slate-50 shadow-sm'}`}
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
 
-          {/* Logo - click to home */}
-          <div onClick={() => navigate("/")} className="cursor-pointer flex items-center gap-3 group md:ml-0">
+          {/* Logo - click to home - Hidden on Mobile */}
+          <div onClick={() => navigate("/")} className="hidden md:flex cursor-pointer items-center gap-3 group md:ml-0">
             <img src={assets.logo} alt="logo" className="w-auto h-8 md:h-10 object-contain" />
           </div>
 
@@ -93,8 +93,8 @@ const Navbar = () => {
             <AnimatedThemeToggler />
 
             {token && userData ? (
-              <div className="relative profile-pill-container">
-                <div 
+              <div className="relative profile-pill-container hidden md:block">
+                <div
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className={`flex items-center gap-2 pr-4 pl-1.5 py-1.5 rounded-full border transition-all cursor-pointer shadow-sm
                     ${isNight ? 'bg-[#1a1a1a] border-white/10 hover:bg-zinc-900' : 'bg-slate-50 border-slate-100 hover:bg-slate-100'}`}
@@ -112,14 +112,14 @@ const Navbar = () => {
                   ${isProfileOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none md:group-hover:opacity-100 md:group-hover:translate-y-0 md:group-hover:pointer-events-auto'}
                 `}>
                   <div className={`border rounded-2xl p-2 shadow-2xl ${isNight ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-slate-100'}`}>
-                    <div 
-                      onClick={() => { navigate("/my-profile"); setIsProfileOpen(false); }} 
+                    <div
+                      onClick={() => { navigate("/my-profile"); setIsProfileOpen(false); }}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase cursor-pointer transition-colors ${isNight ? 'text-white hover:bg-zinc-900' : 'text-slate-900 hover:bg-slate-50'}`}
                     >
                       <User className="w-4 h-4 opacity-50" /> Account Settings
                     </div>
-                    <div 
-                      onClick={() => { logout(); navigate("/login"); setIsProfileOpen(false); }} 
+                    <div
+                      onClick={() => { logout(); navigate("/login"); setIsProfileOpen(false); }}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 rounded-xl text-xs font-bold text-red-500 uppercase cursor-pointer transition-colors"
                     >
                       <LogOut className="w-4 h-4" /> Terminate Access
@@ -140,24 +140,24 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu Overlay */}
-        <div className={`md:hidden fixed inset-0 top-20 z-[2000] transition-all duration-500 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`md:hidden fixed inset-0 top-0 z-[2000] transition-all duration-500 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
           <div className={`absolute inset-0 bg-black/40`} onClick={() => setIsMenuOpen(false)} />
-          <div className={`absolute left-0 top-0 bottom-10 w-4/5 max-w-sm transition-transform duration-500 ease-out p-6 shadow-2xl
+          <div className={`absolute left-0 top-0 bottom-0 w-4/5 max-w-sm transition-transform duration-500 ease-out p-6 shadow-2xl
             ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
             ${isNight ? 'bg-[#000000] border-r border-white/5' : 'bg-white'}`}>
-            
+
             <div className="flex flex-col h-full text-foreground">
               <p className={`text-[10px] font-bold uppercase tracking-widest mb-6 ${isNight ? 'text-zinc-500' : 'text-slate-400'}`}>Navigation</p>
-              
+
               <div className="space-y-2 flex-grow">
                 {navItems.map((item, idx) => {
                   const isActive = location.pathname === item.href;
                   return (
-                    <div 
+                    <div
                       key={idx}
                       onClick={() => navigate(item.href)}
                       className={`flex items-center gap-4 p-4 rounded-2xl transition-all cursor-pointer border
-                        ${isActive 
+                        ${isActive
                           ? (isNight ? 'bg-white text-black border-white' : 'bg-slate-900 text-white border-slate-900 shadow-lg')
                           : (isNight ? 'text-white border-transparent hover:bg-zinc-900' : 'text-slate-600 border-transparent hover:bg-slate-50')
                         }`}
@@ -171,7 +171,7 @@ const Navbar = () => {
 
               {token && userData && (
                 <div className={`mt-auto pt-6 border-t ${isNight ? 'border-white/5' : 'border-slate-100'}`}>
-                  <div 
+                  <div
                     onClick={() => navigate("/my-profile")}
                     className={`flex items-center gap-4 p-4 rounded-2xl mb-2 cursor-pointer ${isNight ? 'hover:bg-zinc-900' : 'hover:bg-slate-50'}`}
                   >
@@ -181,7 +181,7 @@ const Navbar = () => {
                       <p className="text-[10px] text-zinc-500 uppercase font-bold">Manage Account</p>
                     </div>
                   </div>
-                  <div 
+                  <div
                     onClick={() => { logout(); navigate("/login"); }}
                     className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer hover:bg-red-500/10 text-red-500`}
                   >

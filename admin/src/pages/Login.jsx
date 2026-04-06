@@ -49,7 +49,7 @@ const Login = () => {
     <form onSubmit={onSubmitHandler} className='min-h-screen flex flex-col items-center justify-center bg-black'>
       <img className='w-24 h-24 mb-6 hover:scale-110 transition-all' src={assets.appointly_logo} alt="Appointly Logo" />
 
-      <div className='glass-card flex flex-col gap-6 items-start p-10 min-w-[340px] sm:min-w-[420px] text-white'>
+      <div className='glass-card flex flex-col gap-6 items-start p-8 sm:p-10 w-[calc(100%-32px)] sm:w-[420px] text-white'>
         <div className='w-full'>
           <h1 className='text-2xl font-bold mb-1'>{state} Panel</h1>
           <p className='text-gray-400 font-medium'>Please sign in to continue</p>

@@ -108,10 +108,10 @@ const Login = () => {
   const isNight = theme === "night";
 
   return (
-    <div className={`h-screen w-full pt-4 pb-3 flex flex-col items-center justify-center font-inter transition-colors duration-500 fixed inset-0 overflow-hidden
+    <div className={`min-h-screen w-full pt-10 pb-10 flex flex-col items-center justify-center font-inter transition-colors duration-500 overflow-y-auto
       ${isNight ? 'bg-[#000000]' : 'bg-[#f9fafb]'}`}
     >
-      <div className="max-w-7xl mx-auto px-6 w-full flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 w-full flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-24 relative z-10">
 
         {/* Left Section */}
         <motion.div
@@ -130,11 +130,11 @@ const Login = () => {
         </motion.div>
 
         {/* Right Section: Form */}
-        <div className="w-full lg:w-[480px] flex items-center justify-center">
+        <div className="w-full sm:w-[540px] lg:w-[480px] flex items-center justify-center px-2">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`w-full p-10 border rounded-[40px] relative overflow-hidden transition-all duration-500
+            className={`w-full p-6 sm:p-10 border rounded-[40px] relative overflow-hidden transition-all duration-500
               ${isNight
                 ? 'bg-[#060606] border-white/5 shadow-[0_32px_120px_-15px_rgba(0,0,0,1)]'
                 : 'bg-white border-slate-100 shadow-[0_32px_120px_-15px_rgba(0,0,0,0.08)]'}`}
