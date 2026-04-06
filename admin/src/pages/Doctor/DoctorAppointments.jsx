@@ -7,7 +7,7 @@ import { assets } from '../../assets/assets'
 const DoctorAppointments = () => {
 
   const { dToken, appointments, getAppointments, cancelAppointment, completeAppointment } = useContext(DoctorContext)
-  const { slotDateFormat, calculateAge, currency } = useContext(AppContext)
+  const { slotDateFormat, calculateAge, currency, backendUrl } = useContext(AppContext)
 
   useEffect(() => {
     if (dToken) {
@@ -24,7 +24,7 @@ const DoctorAppointments = () => {
       </div>
 
       <div className='glass-card overflow-hidden'>
-        <div className='max-sm:hidden grid grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1fr] gap-4 py-5 px-8 border-b border-white/10 bg-white/5 text-gray-300 font-semibold uppercase text-xs tracking-wider'>
+        <div className='max-sm:hidden grid grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1.5fr] gap-4 py-5 px-8 border-b border-white/10 bg-white/5 text-gray-300 font-semibold uppercase text-xs tracking-wider'>
           <p>#</p>
           <p>Patient</p>
           <p>Payment</p>
@@ -33,14 +33,23 @@ const DoctorAppointments = () => {
           <p>Fees</p>
           <p className='text-right'>Action</p>
         </div>
-
+ 
         <div className='max-h-[70vh] overflow-y-auto'>
           {appointments.map((item, index) => (
-            <div className='flex flex-wrap justify-between max-sm:gap-4 sm:grid sm:grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1fr] gap-4 items-center text-gray-400 py-4 px-8 border-b border-white/5 hover:bg-white/5 transition-all group' key={index}>
+            <div className='flex flex-wrap justify-between max-sm:gap-4 sm:grid sm:grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1.5fr] gap-4 items-center text-gray-400 py-4 px-8 border-b border-white/5 hover:bg-white/5 transition-all group' key={index}>
               <p className='max-sm:hidden font-medium'>{index + 1}</p>
               <div className='flex items-center gap-3'>
-                <img src={item.userData.image} className='w-10 h-10 rounded-full border border-white/10' alt="" />
-                <p className='text-white font-semibold'>{item.userData.name}</p>
+                <img 
+                  src={item.userData?.image 
+                    ? (item.userData.image.startsWith('http') 
+                        ? item.userData.image 
+                        : `${backendUrl || "http://localhost:5000"}/${item.userData.image.replace(/^\//, '')}`) 
+                    : "https://www.w3schools.com/howto/img_avatar.png"} 
+                  className='w-10 h-10 rounded-full border border-white/10 object-cover shadow-sm bg-white/5' 
+                  onError={(e) => { e.target.src = "https://www.w3schools.com/howto/img_avatar.png" }}
+                  alt="" 
+                />
+                <p className='text-white font-semibold'>{item.userData?.name}</p>
               </div>
               <div>
                 <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border transition-all ${item.paymentStatus === 'Paid' ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.1)]' : 'bg-orange-500/10 text-orange-400 border-orange-500/20'}`}>

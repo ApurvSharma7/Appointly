@@ -5,7 +5,7 @@ import { AppContext } from '../../context/AppContext'
 
 const Dashboard = () => {
 
-  const { aToken, getDashData, cancelAppointment, dashData } = useContext(AdminContext)
+  const { aToken, getDashData, cancelAppointment, completeAppointment, dashData } = useContext(AdminContext)
   const { slotDateFormat, currency } = useContext(AppContext)
 
   useEffect(() => {
@@ -63,7 +63,16 @@ const Dashboard = () => {
         <div className='p-2'>
           {dashData.latestAppointments.slice(0, 5).map((item, index) => (
             <div className='flex items-center px-6 py-4 gap-4 hover:bg-white/5 rounded-xl transition-all group' key={index}>
-              <img className='rounded-full w-12 h-12 object-cover border-2 border-white/10' src={item.docData?.image || '/default-avatar.png'} alt="" />
+              <img 
+                className='rounded-full w-12 h-12 object-cover border-2 border-white/10 shadow-sm transition-transform group-hover:scale-105' 
+                src={item.docData?.image 
+                  ? (item.docData.image.startsWith('http') 
+                      ? item.docData.image 
+                      : `${backendUrl || "http://localhost:5000"}/${item.docData.image.replace(/^\//, '')}`) 
+                  : "https://www.w3schools.com/howto/img_avatar.png"} 
+                onError={(e) => { e.target.src = "https://www.w3schools.com/howto/img_avatar.png" }}
+                alt="" 
+              />
               <div className='flex-1'>
                 <p className='text-white font-semibold text-base mb-0.5'>{item.docData?.name || 'Unknown Doctor'}</p>
                 <p className='text-gray-400 text-sm'>Booking on {slotDateFormat(item.slotDate)}</p>
@@ -74,15 +83,26 @@ const Dashboard = () => {
                   ? <span className='px-3 py-1 bg-red-500/10 text-red-400 text-[10px] font-bold rounded-full border border-red-500/20 uppercase tracking-wider'>Cancelled</span>
                   : (item.isCompleted || item.status === 'Completed')
                     ? <span className='px-3 py-1 bg-green-500/10 text-green-400 text-[10px] font-bold rounded-full border border-green-500/20 uppercase tracking-wider'>Completed</span>
-                    : <button
-                      onClick={() => cancelAppointment(item._id)}
-                      className='w-10 h-10 flex items-center justify-center bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-full transition-all duration-300'
-                      title="Cancel"
-                    >
-                      <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M6 18L18 6M6 6l12 12' />
-                      </svg>
-                    </button>
+                    : <div className='flex items-center gap-2'>
+                        <button
+                          onClick={() => completeAppointment(item._id)}
+                          className='w-10 h-10 flex items-center justify-center bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white rounded-full transition-all duration-300'
+                          title="Complete"
+                        >
+                          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M5 13l4 4L19 7' />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => cancelAppointment(item._id)}
+                          className='w-10 h-10 flex items-center justify-center bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-full transition-all duration-300'
+                          title="Cancel"
+                        >
+                          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M6 18L18 6M6 6l12 12' />
+                          </svg>
+                        </button>
+                      </div>
                 }
               </div>
             </div>

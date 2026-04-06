@@ -7,7 +7,7 @@ import { AppContext } from '../../context/AppContext'
 const AllAppointments = () => {
 
   const { aToken, appointments, cancelAppointment, completeAppointment, getAllAppointments, doctors, getAllDoctors } = useContext(AdminContext)
-  const { slotDateFormat, calculateAge, currency } = useContext(AppContext)
+  const { slotDateFormat, calculateAge, currency, backendUrl } = useContext(AppContext)
 
   useEffect(() => {
     if (aToken) {
@@ -25,7 +25,7 @@ const AllAppointments = () => {
       </div>
 
       <div className='glass-card overflow-hidden'>
-        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] py-5 px-8 border-b border-white/10 bg-white/5 text-gray-300 font-semibold uppercase text-xs tracking-wider'>
+        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1.5fr] py-5 px-8 border-b border-white/10 bg-white/5 text-gray-300 font-semibold uppercase text-xs tracking-wider'>
           <p>#</p>
           <p>Patient</p>
           <p>Age</p>
@@ -37,10 +37,19 @@ const AllAppointments = () => {
 
         <div className='max-h-[70vh] overflow-y-auto'>
           {appointments.map((item, index) => (
-            <div className='flex flex-wrap justify-between max-sm:gap-4 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-400 py-4 px-8 border-b border-white/5 hover:bg-white/5 transition-all group' key={index}>
+            <div className='flex flex-wrap justify-between max-sm:gap-4 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1.5fr] items-center text-gray-400 py-4 px-8 border-b border-white/5 hover:bg-white/5 transition-all group' key={index}>
               <p className='max-sm:hidden font-medium'>{index + 1}</p>
               <div className='flex items-center gap-3'>
-                <img src={item.userData?.image || '/default-avatar.png'} className='w-10 h-10 rounded-full border border-white/10' alt="" />
+                <img 
+                  src={item.userData?.image 
+                    ? (item.userData.image.startsWith('http') 
+                        ? item.userData.image 
+                        : `${backendUrl || "http://localhost:5000"}/${item.userData.image.replace(/^\//, '')}`) 
+                    : "https://www.w3schools.com/howto/img_avatar.png"} 
+                  className='w-10 h-10 rounded-full border border-white/10 object-cover shadow-sm bg-white/5' 
+                  onError={(e) => { e.target.src = "https://www.w3schools.com/howto/img_avatar.png" }}
+                  alt="" 
+                />
                 <p className='text-white font-semibold'>{item.userData?.name || 'Unknown User'}</p>
               </div>
               <p className='max-sm:hidden'>{item.userData?.dob ? calculateAge(item.userData.dob) : 'N/A'}</p>
@@ -49,7 +58,16 @@ const AllAppointments = () => {
                 <p className='text-xs text-gray-500'>{item.slotTime}</p>
               </div>
               <div className='flex items-center gap-3'>
-                <img src={item.docData?.image || '/default-avatar.png'} className='w-10 h-10 rounded-full border border-white/10 bg-white/5' alt="" />
+                <img 
+                  src={item.docData?.image 
+                    ? (item.docData.image.startsWith('http') 
+                        ? item.docData.image 
+                        : `${backendUrl || "http://localhost:5000"}/${item.docData.image.replace(/^\//, '')}`) 
+                    : "https://www.w3schools.com/howto/img_avatar.png"} 
+                  className='w-10 h-10 rounded-full border border-white/10 bg-white/5 object-cover shadow-sm' 
+                  onError={(e) => { e.target.src = "https://www.w3schools.com/howto/img_avatar.png" }}
+                  alt="" 
+                />
                 <p className='text-white font-medium'>{item.docData?.name || 'Unknown Doctor'}</p>
               </div>
               <p className='text-white font-bold text-lg'>

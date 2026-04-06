@@ -39,15 +39,26 @@ const MyAppointments = () => {
   const handlePayment = async (amount, apptId) => {
     try {
       if (!token) return navigate("/login");
-
+ 
+      // 1. Script Check (Critical for mobile)
+      if (!window.Razorpay) {
+        toast.error("Razorpay SDK not loaded. Please refresh or check your internet.");
+        console.error("Razorpay script not found in window object");
+        return;
+      }
+ 
+      // 2. Initiate Order on Backend
       const { data } = await axios.post(
         `${backendUrl}/api/payment/razorpay`,
         { amount, appointmentId: apptId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      if (!data.success) return toast.error("Payment initiation failed");
-
+ 
+      if (!data.success) {
+        toast.error(data.message || "Payment initiation failed");
+        return;
+      }
+ 
       const { order } = data;
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -75,12 +86,29 @@ const MyAppointments = () => {
             toast.error("Payment verification failed");
           }
         },
+        modal: {
+          ondismiss: () => {
+            toast.info("Payment cancelled");
+          }
+        },
         theme: { color: isNight ? "#000000" : "#5f6fff" },
       };
-      new window.Razorpay(options).open();
+ 
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        toast.error("Payment Failed: " + response.error.description);
+      });
+      rzp.open();
+      
     } catch (err) {
       console.error("Payment error:", err);
-      toast.error("Payment failed");
+      const errorMsg = err.response?.data?.message || err.message || "Payment failed";
+      toast.error(errorMsg);
+      
+      // If it's a network error on mobile, explain why
+      if (err.message === "Network Error" && backendUrl.includes("localhost")) {
+        toast.info("Mobile devices cannot reach 'localhost'. Use your computer's IP address instead.");
+      }
     }
   };
 

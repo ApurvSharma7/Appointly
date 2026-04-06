@@ -41,11 +41,11 @@ const appointmentSchema = new mongoose.Schema(
 // Only for non-cancelled appointments
 appointmentSchema.index(
   { docId: 1, slotDate: 1, slotTime: 1, status: 1 },
-  { 
-    unique: true, 
-    partialFilterExpression: { 
-      status: { $in: ["Pending", "Confirmed"] } 
-    } 
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: ["Pending", "Confirmed"] }
+    }
   }
 );
 

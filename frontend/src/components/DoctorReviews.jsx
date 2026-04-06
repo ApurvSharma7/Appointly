@@ -8,13 +8,13 @@ const DoctorReviews = ({ doctorId }) => {
   const [reviews, setReviews] = useState([]);
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { theme } = useContext(AppContext);
+  const { theme, backendUrl } = useContext(AppContext);
   const isNight = theme === 'night';
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/user/doctor-reviews/${doctorId}`);
+        const response = await axios.get(`${backendUrl}/api/user/doctor-reviews/${doctorId}`);
         if (response.data.success) {
           setDoctor(response.data.data.doctor);
           setReviews(response.data.data.reviews);
@@ -59,24 +59,24 @@ const DoctorReviews = ({ doctorId }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-[40px] p-8 md:p-12 border ${isNight ? 'bg-[#0a0a0a] border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.8)]' : 'bg-white border-gray-200 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'}`}
+      className={`rounded-[24px] md:rounded-[40px] p-5 md:p-12 border w-full overflow-hidden ${isNight ? 'bg-[#0a0a0a] border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.8)]' : 'bg-white border-gray-200 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'}`}
     >
       {/* Header */}
-      <div className={`flex items-center justify-between pb-8 border-b ${isNight ? 'border-white/5' : 'border-gray-100'}`}>
+      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 md:pb-8 border-b gap-4 ${isNight ? 'border-white/5' : 'border-gray-100'}`}>
         <div className="flex items-center gap-3">
           <MessageSquare className={`w-5 h-5 ${isNight ? 'text-zinc-500' : 'text-gray-400'}`} />
-          <h3 className={`text-2xl font-bold ${isNight ? 'text-white' : 'text-gray-900'}`}>
+          <h3 className={`text-xl md:text-2xl font-bold ${isNight ? 'text-white' : 'text-gray-900'}`}>
             Patient Reviews
           </h3>
         </div>
         {doctor && doctor.totalRatings > 0 && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <StarRow rating={Math.round(doctor.averageRating)} size="md" />
             <div className="text-right">
-              <p className={`text-lg font-bold leading-none ${isNight ? 'text-white' : 'text-gray-900'}`}>
+              <p className={`text-base md:text-lg font-bold leading-none ${isNight ? 'text-white' : 'text-gray-900'}`}>
                 {doctor.averageRating.toFixed(1)}
               </p>
-              <p className={`text-[10px] uppercase tracking-widest font-bold mt-1 ${isNight ? 'text-zinc-500' : 'text-gray-400'}`}>
+              <p className={`text-[8px] md:text-[10px] uppercase tracking-widest font-bold mt-1 ${isNight ? 'text-zinc-500' : 'text-gray-400'}`}>
                 {doctor.totalRatings} review{doctor.totalRatings !== 1 ? 's' : ''}
               </p>
             </div>

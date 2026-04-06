@@ -22,6 +22,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // routes
 app.use("/api/user", userRoutes);
@@ -50,3 +51,5 @@ mongoose
     });
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
+
+export default app;

@@ -21,7 +21,7 @@ import PublicRoute from './components/PublicRoute'
 
 const App = () => {
   return (
-    <div className='bg-[var(--bg-primary)] min-h-screen transition-colors duration-500'>
+    <div className='bg-[var(--bg-primary)] min-h-screen transition-colors duration-500 overflow-x-hidden w-full'>
       <ToastContainer />
       <Navbar />
 

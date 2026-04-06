@@ -70,17 +70,17 @@ const MyProfile = () => {
   );
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-svh overflow-hidden bg-[var(--bg-primary)] px-4 font-inter text-[var(--text-main)] selection:bg-[var(--text-main)] selection:text-[var(--bg-primary)] transition-colors duration-500">
-      <div className="text-center mb-0 mt-8">
+    <div className="flex flex-col items-center w-full min-h-screen bg-[var(--bg-primary)] px-4 pt-32 pb-16 font-inter text-[var(--text-main)] selection:bg-[var(--text-main)] selection:text-[var(--bg-primary)] transition-colors duration-500">
+      <div className="text-center mb-8">
         <h1 className={`text-4xl md:text-5xl font-bold tracking-tight ${theme === "night" ? "text-white" : "text-slate-900"}`}>
           My <span className="italic text-[#4ca6a3]">Profile</span>
         </h1>
       </div>
-      <div className="w-full max-w-5xl flex flex-col md:flex-row items-stretch justify-center px-4 md:px-10 gap-12 md:gap-10 pt-10 relative">
+      <div className="w-full max-w-5xl flex flex-col md:flex-row items-start px-4 md:px-10 gap-12 md:gap-10 relative">
 
         {/* Left Column: Avatar & Name */}
-        <div className="w-full md:w-1/3 flex flex-col justify-center items-center gap-6 shrink-0 md:pr-10 md:py-10 md:border-r border-[var(--border-color)]">
-          <div className="w-36 h-36 rounded-full overflow-hidden bg-[rgba(128,128,128,0.1)] relative border border-[var(--border-color)] shadow-sm">
+        <div className="w-full md:w-1/3 flex flex-col items-center gap-6 shrink-0 md:pr-10 md:py-10 md:border-r border-[var(--border-color)]">
+          <div className="w-40 h-40 rounded-full overflow-hidden bg-[rgba(128,128,128,0.1)] relative border border-[var(--border-color)] shadow-sm">
             <img
               src={
                 image ? URL.createObjectURL(image)
@@ -93,7 +93,7 @@ const MyProfile = () => {
             />
             {isEdit && (
               <label className="absolute inset-0 bg-black/50 cursor-pointer flex items-center justify-center backdrop-blur-[2px] transition-colors hover:bg-black/60 text-white">
-                <span className="text-sm font-medium">change</span>
+                <span className="text-sm font-medium uppercase tracking-widest">change</span>
                 <input type="file" hidden onChange={e => setImage(e.target.files[0])} />
               </label>
             )}
@@ -104,7 +104,7 @@ const MyProfile = () => {
               <input
                 value={localUser.name}
                 onChange={e => setLocalUser({ ...localUser, name: e.target.value })}
-                className={`text-2xl font-bold backdrop-blur-md rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.05)] px-6 py-2 text-center outline-none w-full border-none transition-all ${theme === "night"
+                className={`text-2xl font-bold rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.05)] px-6 py-2 text-center outline-none w-full border-none transition-all ${theme === "night"
                   ? "bg-[rgba(255,255,255,0.05)] text-white focus:bg-[rgba(255,255,255,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
                   : "bg-[rgba(0,0,0,0.05)] text-black focus:bg-[rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
                   }`}

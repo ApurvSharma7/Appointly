@@ -32,8 +32,8 @@ const appointmentsAdmin = async (req, res) => {
     try {
 
         const appointments = await appointmentModel.find({})
-            .populate('userId', 'name email image dob')
-            .populate('docId', 'name email image speciality')
+            .populate('userId', '-password')
+            .populate('docId', '-password')
         
         // Transform the data to match frontend expectations
         const transformedAppointments = appointments.map(appointment => ({
@@ -161,8 +161,8 @@ const adminDashboard = async (req, res) => {
         const doctors = await doctorModel.find({})
         const users = await userModel.find({})
         const appointments = await appointmentModel.find({})
-            .populate('userId', 'name email image dob')
-            .populate('docId', 'name email image speciality fees')
+            .populate('userId', '-password')
+            .populate('docId', '-password')
 
         // Transform the appointments data to match frontend expectations
         const transformedAppointments = appointments.map(appointment => ({
