@@ -308,7 +308,7 @@ export const bookAppointment = async (req, res) => {
     try {
       const emailSubject = `New Appointment Booking - ${doctor.name}`;
       const emailText = `
-Dear Dr. ${doctor.name},
+Dear ${doctor.name},
 
 A new appointment has been booked with you:
 
@@ -360,15 +360,15 @@ Medigo Team
       console.log(`✅ Appointment email sent to doctor: ${doctor.docId?.email}`);
 
       // --- 2. Notification to Patient ---
-      const patientSubject = `Booking Request Received - Dr. ${doctor.name}`;
+      const patientSubject = `Booking Request Received - ${doctor.name}`;
       const patientHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937;">
           <h2 style="color: #2563eb;">Booking Received</h2>
           <p>Dear ${user.name},</p>
-          <p>We've received your appointment request for <strong>Dr. ${doctor.name}</strong>.</p>
+          <p>We've received your appointment request for <strong>${doctor.name}</strong>.</p>
           
           <div style="background-color: #f8fafc; padding: 25px; border-radius: 12px; margin: 20px 0; border: 1px solid #e2e8f0;">
-            <p><strong>Doctor:</strong> Dr. ${doctor.name}</p>
+            <p><strong>Doctor:</strong> ${doctor.name}</p>
             <p><strong>Date:</strong> ${slotDate}</p>
             <p><strong>Time:</strong> ${slotTime}</p>
             <p><strong>Status:</strong> <span style="color: #f59e0b; font-weight: bold;">PENDING</span></p>

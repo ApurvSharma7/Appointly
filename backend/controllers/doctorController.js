@@ -41,7 +41,7 @@ export const loginDoctor = async (req, res) => {
 
     // Find doctor by email
     const doctor = await Doctor.findOne({ email });
-    
+
     if (!doctor) {
       return res.json({ success: false, message: "Doctor not found" });
     }
@@ -52,10 +52,10 @@ export const loginDoctor = async (req, res) => {
       const defaultPassword = "doctor123";
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(defaultPassword, salt);
-      
+
       // Update doctor with default password
       await Doctor.findByIdAndUpdate(doctor._id, { password: hashedPassword });
-      
+
       // Check if provided password matches default
       if (password !== defaultPassword) {
         return res.json({ success: false, message: "Please use default password: doctor123" });
@@ -63,7 +63,7 @@ export const loginDoctor = async (req, res) => {
     } else {
       // Check password if it exists
       const isPasswordValid = await bcrypt.compare(password, doctor.password);
-      
+
       if (!isPasswordValid) {
         return res.json({ success: false, message: "Invalid credentials" });
       }
@@ -76,8 +76,8 @@ export const loginDoctor = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       token,
       doctor: {
         id: doctor._id,
@@ -98,7 +98,7 @@ export const loginDoctor = async (req, res) => {
 export const getDoctorAppointments = async (req, res) => {
   try {
     const doctorId = req.doctorId; // From auth middleware
-    
+
     const appointments = await appointmentModel.find({ docId: doctorId })
       .populate('userId', 'name email image dob')
       .populate('docId', 'name email image speciality fees');
@@ -125,9 +125,9 @@ export const getDoctorAppointments = async (req, res) => {
 export const getDoctorProfile = async (req, res) => {
   try {
     const doctorId = req.doctorId; // From auth middleware
-    
+
     const doctor = await Doctor.findById(doctorId).select('-password');
-    
+
     if (!doctor) {
       return res.status(404).json({ success: false, message: "Doctor not found" });
     }
@@ -147,29 +147,29 @@ export const cancelDoctorAppointment = async (req, res) => {
     const doctorId = req.doctorId; // From auth middleware
 
     // Verify the appointment belongs to this doctor and get full details
-    const appointment = await appointmentModel.findOne({ 
-      _id: appointmentId, 
-      docId: doctorId 
+    const appointment = await appointmentModel.findOne({
+      _id: appointmentId,
+      docId: doctorId
     }).populate('userId', 'name email phone').populate('docId', 'name email');
 
     if (!appointment) {
       return res.json({ success: false, message: "Appointment not found or unauthorized" });
     }
 
-    await appointmentModel.findByIdAndUpdate(appointmentId, { 
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
       status: 'Cancelled',
-      cancelled: true 
+      cancelled: true
     });
 
     // Send email notification to patient
     try {
-      const emailSubject = `Appointment Cancelled - Dr. ${appointment.docId.name}`;
+      const emailSubject = `Appointment Cancelled - ${appointment.docId.name}`;
       const emailText = `
 Dear ${appointment.userId.name},
 
 Your appointment has been cancelled:
 
-Doctor: Dr. ${appointment.docId.name}
+Doctor: ${appointment.docId.name}
 Date: ${appointment.slotDate}
 Time: ${appointment.slotTime}
 Status: Cancelled
@@ -190,7 +190,7 @@ Medigo Team
           
           <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
             <h3 style="color: #dc2626; margin-top: 0;">Appointment Details:</h3>
-            <p><strong>Doctor:</strong> Dr. ${appointment.docId.name}</p>
+            <p><strong>Doctor:</strong> ${appointment.docId.name}</p>
             <p><strong>Date:</strong> ${appointment.slotDate}</p>
             <p><strong>Time:</strong> ${appointment.slotTime}</p>
             <p><strong>Status:</strong> <span style="color: #dc2626;">Cancelled</span></p>
@@ -223,29 +223,29 @@ export const completeDoctorAppointment = async (req, res) => {
     const doctorId = req.doctorId; // From auth middleware
 
     // Verify the appointment belongs to this doctor and get full details
-    const appointment = await appointmentModel.findOne({ 
-      _id: appointmentId, 
-      docId: doctorId 
+    const appointment = await appointmentModel.findOne({
+      _id: appointmentId,
+      docId: doctorId
     }).populate('userId', 'name email phone').populate('docId', 'name email');
 
     if (!appointment) {
       return res.json({ success: false, message: "Appointment not found or unauthorized" });
     }
 
-    await appointmentModel.findByIdAndUpdate(appointmentId, { 
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
       status: 'Confirmed',
-      isCompleted: true 
+      isCompleted: true
     });
 
     // Send email notification to patient
     try {
-      const emailSubject = `Appointment Confirmed - Dr. ${appointment.docId.name}`;
+      const emailSubject = `Appointment Confirmed - ${appointment.docId.name}`;
       const emailText = `
 Dear ${appointment.userId.name},
 
 Your appointment has been confirmed:
 
-Doctor: Dr. ${appointment.docId.name}
+Doctor: ${appointment.docId.name}
 Date: ${appointment.slotDate}
 Time: ${appointment.slotTime}
 Status: Confirmed
@@ -266,7 +266,7 @@ Medigo Team
           
           <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #059669;">
             <h3 style="color: #059669; margin-top: 0;">Appointment Details:</h3>
-            <p><strong>Doctor:</strong> Dr. ${appointment.docId.name}</p>
+            <p><strong>Doctor:</strong> ${appointment.docId.name}</p>
             <p><strong>Date:</strong> ${appointment.slotDate}</p>
             <p><strong>Time:</strong> ${appointment.slotTime}</p>
             <p><strong>Status:</strong> <span style="color: #059669;">Confirmed</span></p>
@@ -370,8 +370,8 @@ export const updateDoctorProfile = async (req, res) => {
       return res.json({ success: false, message: "Doctor not found" });
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "Profile updated successfully",
       profileData: updatedDoctor
     });
