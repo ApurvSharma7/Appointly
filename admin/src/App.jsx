@@ -15,8 +15,9 @@ import DoctorAppointments from './pages/Doctor/DoctorAppointments';
 import DoctorDashboard from './pages/Doctor/DoctorDashboard';
 import DoctorProfile from './pages/Doctor/DoctorProfile';
 
-const App = () => {
+import ScrollToTop from './components/ScrollToTop'
 
+const App = () => {
   useLayoutEffect(() => {
     const handleContextMenu = (e) => {
       e.preventDefault();
@@ -59,6 +60,7 @@ const App = () => {
 
   return dToken || aToken ? (
     <div className='bg-black min-h-screen text-white'>
+      <ScrollToTop />
       <ToastContainer theme='dark' />
       <Navbar />
       <div className='flex'>

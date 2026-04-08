@@ -21,6 +21,8 @@ import PublicRoute from './components/PublicRoute'
 
 import { useLayoutEffect } from 'react'
 
+import ScrollToTop from './components/ScrollToTop'
+
 const App = () => {
   useLayoutEffect(() => {
     const handleContextMenu = (e) => {
@@ -61,6 +63,7 @@ const App = () => {
 
   return (
     <div className='bg-[var(--bg-primary)] min-h-screen transition-colors duration-500 overflow-x-hidden w-full'>
+      <ScrollToTop />
       <ToastContainer />
       <Navbar />
 

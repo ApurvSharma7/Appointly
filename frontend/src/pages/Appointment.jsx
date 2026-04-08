@@ -281,10 +281,13 @@ const Appointment = () => {
                           ? (isNight ? "bg-white text-black border-white" : "bg-gray-900 text-white border-gray-900 shadow-sm")
                           : available
                             ? (isNight ? "bg-white/5 text-zinc-400 border-white/5 hover:border-white/20" : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50")
-                            : `bg-white/[0.02] text-zinc-700 border border-white/5 cursor-not-allowed opacity-40`
+                            : `${isNight ? 'bg-zinc-900/50 text-zinc-600 border-zinc-800' : 'bg-gray-100 text-gray-400 border-gray-200'} cursor-not-allowed relative overflow-hidden`
                           }`}
                       >
                         {slot.time}
+                        {!available && (
+                          <div className={`absolute top-1/2 left-0 w-full h-[1px] bg-red-500/50 -rotate-0`}></div>
+                        )}
                       </button>
                     );
                   })}
